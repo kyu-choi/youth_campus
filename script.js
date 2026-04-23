@@ -1,6 +1,6 @@
 // 이 객체 안의 주소와 버튼 이름만 바꾸면 페이지 내용이 바로 반영됩니다.
 const campusProfile = {
-  instagramLabel: "@c.c.univ",
+  instagramLabel: "인스타그램 바로가기",
   instagramUrl: "https://www.instagram.com/c.c.univ/",
   links: [
     {
