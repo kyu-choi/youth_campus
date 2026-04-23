@@ -1,0 +1,121 @@
+.instagram-card,
+.link-section {
+  margin-top: 28px;
+  padding: 24px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.78);
+}
+
+.instagram-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.section-label {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mint-deep);
+}
+
+.instagram-link {
+  display: inline-block;
+  margin-top: 10px;
+  color: var(--teal-deep);
+  font-size: clamp(1.15rem, 3vw, 1.45rem);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.instagram-link:hover,
+.instagram-link:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+
+.instagram-badge {
+  flex-shrink: 0;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: linear-gradient(
+    135deg,
+    rgba(111, 191, 154, 0.88),
+    rgba(88, 195, 178, 0.88)
+  );
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.link-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.link-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: 20px;
+  color: var(--text);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.96),
+    rgba(232, 250, 246, 0.9)
+  );
+  border: 1px solid rgba(111, 191, 154, 0.35);
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: 0 14px 24px rgba(29, 123, 114, 0.08);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.link-button span {
+  font-size: 1.15rem;
+  color: var(--teal-deep);
+  transition: transform 180ms ease;
+}
+
+.link-button:hover,
+.link-button:focus-visible {
+  transform: translateY(-3px);
+  border-color: rgba(29, 123, 114, 0.4);
+  box-shadow: 0 18px 28px rgba(29, 123, 114, 0.14);
+}
+
+.link-button:hover span,
+.link-button:focus-visible span {
+  transform: translateX(4px);
+}
+
+.contact-footer {
+  margin: 28px 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.contact-link {
+  color: var(--teal-deep);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.contact-link:hover,
+.contact-link:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}

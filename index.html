@@ -3,14 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>청춘캠퍼스</title>
+    <title>청춘 캠퍼스</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="src/styles/main.css" />
   </head>
   <body>
     <div class="page-shell">
@@ -20,11 +20,8 @@
       <div class="petal petal-d"></div>
 
       <main class="landing-card">
-        <p class="eyebrow">Spring Link Garden</p>
-        <h1 class="banner-title">청춘캠퍼스</h1>
-        <p class="intro">
-          지인 소개는 부담스럽고, 과팅보다 설레는 우리들의 캠퍼스
-        </p>
+        <h1 id="hero-title" class="banner-title"></h1>
+        <p id="hero-subtitle" class="intro"></p>
 
         <section class="instagram-card" aria-labelledby="instagram-title">
           <div>
@@ -37,7 +34,11 @@
               rel="noreferrer"
             ></a>
           </div>
-          <span class="instagram-badge" aria-hidden="true">Blooming Now</span>
+          <span
+            id="instagram-badge"
+            class="instagram-badge"
+            aria-hidden="true"
+          ></span>
         </section>
 
         <section class="link-section" aria-label="주요 링크">
@@ -45,18 +46,28 @@
         </section>
 
         <footer class="contact-footer">
-          개인적인 문의는
+          <span id="contact-prefix"></span>
           <a
+            id="contact-link"
             class="contact-link"
-            href="http://pf.kakao.com/_DGhCX"
+            href="#"
             target="_blank"
             rel="noreferrer"
-            >카카오톡 채널</a
-          >로 연락 주세요.
+          ></a>
+          <span id="contact-suffix"></span>
         </footer>
       </main>
     </div>
 
-    <script src="script.js"></script>
+    <script defer src="src/js/config/site-config.js"></script>
+    <script defer src="src/js/config/supabase-config.js"></script>
+    <script defer src="src/js/dom/landing-elements.js"></script>
+    <script defer src="src/js/services/supabase-client.js"></script>
+    <script defer src="src/js/services/campus-content-service.js"></script>
+    <script defer src="src/js/ui/render-hero.js"></script>
+    <script defer src="src/js/ui/render-instagram.js"></script>
+    <script defer src="src/js/ui/render-quick-links.js"></script>
+    <script defer src="src/js/ui/render-contact.js"></script>
+    <script defer src="src/js/main.js"></script>
   </body>
 </html>

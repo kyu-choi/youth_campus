@@ -1,0 +1,13 @@
+:root {
+  --cream: #f7fffc;
+  --blush: #d8f4ee;
+  --peach: #bce8de;
+  --teal: #58c3b2;
+  --teal-deep: #1d7b72;
+  --mint: #6fbf9a;
+  --mint-deep: #2b6c64;
+  --text: #23433f;
+  --muted: #5d7a75;
+  --card-shadow: 0 24px 60px rgba(69, 125, 119, 0.18);
+  --border: rgba(255, 255, 255, 0.7);
+}
