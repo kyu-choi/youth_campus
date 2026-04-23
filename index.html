@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>청춘캠퍼스</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <div class="petal petal-a"></div>
+      <div class="petal petal-b"></div>
+      <div class="petal petal-c"></div>
+      <div class="petal petal-d"></div>
+
+      <main class="landing-card">
+        <p class="eyebrow">Spring Link Garden</p>
+        <h1 class="banner-title">청춘캠퍼스</h1>
+        <p class="intro">
+          봄 햇살처럼 가볍고 따뜻한 순간들을 모아두는 공간입니다.
+          인스타그램과 주요 링크를 아래에서 바로 확인해보세요.
+        </p>
+
+        <section class="instagram-card" aria-labelledby="instagram-title">
+          <div>
+            <p id="instagram-title" class="section-label">Instagram</p>
+            <a
+              id="instagram-link"
+              class="instagram-link"
+              href="#"
+              target="_blank"
+              rel="noreferrer"
+            ></a>
+          </div>
+          <span class="instagram-badge">Blooming Now</span>
+        </section>
+
+        <section class="link-section" aria-labelledby="quick-links-title">
+          <div class="section-heading">
+            <p id="quick-links-title" class="section-label">Quick Links</p>
+            <p class="section-copy">
+              원하는 사이트로 바로 이동할 수 있도록 버튼을 배치했습니다.
+            </p>
+          </div>
+
+          <div id="link-list" class="link-list"></div>
+        </section>
+
+        <p class="edit-note">
+          인스타그램 주소와 버튼 링크는 <strong>script.js</strong>에서 쉽게
+          수정할 수 있습니다.
+        </p>
+      </main>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
