@@ -1,0 +1,43 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="seal" x1="190" y1="118" x2="832" y2="884" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#23C0C4"/>
+      <stop offset="1" stop-color="#087B84"/>
+    </linearGradient>
+    <filter id="softShadow" x="54" y="64" width="916" height="916" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#24464B" flood-opacity="0.24"/>
+    </filter>
+    <path id="topArc" d="M154 514C154 316.177 314.177 156 512 156C709.823 156 870 316.177 870 514"/>
+    <path id="bottomArc" d="M820 666C734 820 527 879 358 820C296 798 242 758 204 706"/>
+  </defs>
+
+  <circle cx="512" cy="512" r="438" fill="url(#seal)" filter="url(#softShadow)"/>
+  <circle cx="512" cy="512" r="414" stroke="white" stroke-width="10" opacity="0.92"/>
+  <circle cx="512" cy="512" r="385" stroke="white" stroke-width="5" opacity="0.78"/>
+  <circle cx="512" cy="512" r="292" fill="#F8FBF8"/>
+
+  <text fill="white" font-family="Inter, Arial, sans-serif" font-size="74" font-weight="800" letter-spacing="6">
+    <textPath href="#topArc" startOffset="50%" text-anchor="middle">CHEONGCHUN UNIVERSITY</textPath>
+  </text>
+  <text fill="white" font-family="'IBM Plex Sans KR', 'Noto Sans KR', sans-serif" font-size="70" font-weight="800" letter-spacing="22">
+    <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">청춘 캠퍼스</textPath>
+  </text>
+
+  <g fill="white">
+    <path d="M198 744C181 726 151 737 151 763C151 790 198 812 198 812C198 812 245 790 245 763C245 737 215 726 198 744Z"/>
+    <path d="M826 744C809 726 779 737 779 763C779 790 826 812 826 812C826 812 873 790 873 763C873 737 843 726 826 744Z"/>
+  </g>
+
+  <g fill="#0B9AA3">
+    <circle cx="393" cy="428" r="48"/>
+    <circle cx="631" cy="428" r="48"/>
+    <path d="M255 461H769V520H694V563L785 654C801 670 789 697 767 697H705L628 620L551 697H473L396 620L319 697H257C235 697 223 670 239 654L330 563V520H255V461Z"/>
+    <path d="M445 520H579V604L512 671L445 604V520Z" fill="#F8FBF8"/>
+  </g>
+
+  <g fill="#14AAB3">
+    <path d="M505 330C489 312 458 322 458 349C458 379 505 402 505 402C505 402 552 379 552 349C552 322 521 312 505 330Z"/>
+    <path d="M590 374C573 356 542 366 542 393C542 423 590 447 590 447C590 447 638 423 638 393C638 366 607 356 590 374Z"/>
+    <path d="M528 433C515 419 492 427 492 448C492 471 528 489 528 489C528 489 564 471 564 448C564 427 541 419 528 433Z"/>
+  </g>
+</svg>

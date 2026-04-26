@@ -1,18 +1,18 @@
 :root {
-  --cream: #fffaf7;
-  --blush: #ffe3ec;
-  --peach: #ffb7a1;
-  --coral: #ff6f61;
-  --coral-deep: #d84254;
-  --teal: #39c6c0;
-  --teal-deep: #147e85;
-  --mint: #9ee8c8;
-  --mint-deep: #2e7a6f;
-  --lilac: #c7b7ff;
-  --lilac-deep: #6452b8;
-  --yellow: #ffe58a;
-  --text: #273044;
-  --muted: #667085;
-  --card-shadow: 0 24px 60px rgba(216, 66, 84, 0.14);
-  --border: rgba(255, 255, 255, 0.78);
+  --cream: #f7fbf8;
+  --blush: #e7f3ef;
+  --peach: #d4ece7;
+  --coral: #4aa9b0;
+  --coral-deep: #257c85;
+  --teal: #54aeb5;
+  --teal-deep: #2d7f87;
+  --mint: #b9ded6;
+  --mint-deep: #477f77;
+  --lilac: #d6e6e4;
+  --lilac-deep: #3f747b;
+  --yellow: #f2efe5;
+  --text: #24464b;
+  --muted: #668084;
+  --card-shadow: 0 24px 60px rgba(45, 127, 135, 0.18);
+  --border: rgba(255, 255, 255, 0.84);
 }

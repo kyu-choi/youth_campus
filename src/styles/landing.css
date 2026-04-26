@@ -42,24 +42,48 @@
   padding: 32px 18px 24px;
   border: 1px solid var(--border);
   border-radius: 26px;
-  background: rgba(255, 250, 247, 0.84);
+  background: rgba(247, 251, 248, 0.88);
   backdrop-filter: blur(12px);
   box-shadow: var(--card-shadow);
+  text-align: center;
+}
+
+.brand-lockup {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.brand-logo {
+  display: block;
+  width: clamp(104px, 34vw, 148px);
+  height: auto;
+  border-radius: 50%;
+  filter: drop-shadow(0 18px 28px rgba(45, 127, 135, 0.2));
+}
+
+.brand-tagline {
+  margin: 0;
+  color: var(--mint-deep);
+  font-size: clamp(0.78rem, 3.4vw, 0.92rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .banner-title {
   margin: 0;
-  font-family: "Cormorant Garamond", "Times New Roman", serif;
-  font-size: clamp(2.7rem, 15vw, 4.6rem);
-  font-weight: 700;
-  line-height: 0.95;
-  letter-spacing: -0.04em;
+  font-family: "Inter", "IBM Plex Sans KR", sans-serif;
+  font-size: clamp(2.25rem, 12vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1.04;
+  letter-spacing: 0;
   color: var(--coral-deep);
 }
 
 .intro {
-  max-width: 32rem;
-  margin: 14px 0 0;
+  max-width: 34rem;
+  margin: 14px auto 0;
   font-size: 0.98rem;
   line-height: 1.72;
   color: var(--muted);
@@ -82,8 +106,8 @@
   background: radial-gradient(
     circle at 30% 30%,
     rgba(255, 255, 255, 0.82),
-    rgba(255, 183, 161, 0.72) 55%,
-    rgba(255, 111, 97, 0.08) 100%
+    rgba(185, 222, 214, 0.76) 55%,
+    rgba(84, 174, 181, 0.08) 100%
   );
 }
 
@@ -95,8 +119,8 @@
   background: radial-gradient(
     circle at 35% 30%,
     rgba(248, 255, 245, 0.92),
-    rgba(199, 183, 255, 0.68) 60%,
-    rgba(100, 82, 184, 0.08) 100%
+    rgba(84, 174, 181, 0.48) 60%,
+    rgba(45, 127, 135, 0.08) 100%
   );
   animation-delay: -3s;
 }
@@ -109,8 +133,8 @@
   background: radial-gradient(
     circle at 35% 30%,
     rgba(255, 255, 255, 0.9),
-    rgba(158, 232, 200, 0.78) 58%,
-    rgba(57, 198, 192, 0.08) 100%
+    rgba(212, 236, 231, 0.82) 58%,
+    rgba(71, 127, 119, 0.08) 100%
   );
   animation-delay: -5s;
 }
@@ -123,8 +147,8 @@
   background: radial-gradient(
     circle at 40% 35%,
     rgba(255, 255, 255, 0.94),
-    rgba(255, 229, 138, 0.72) 62%,
-    rgba(255, 111, 97, 0.08) 100%
+    rgba(242, 239, 229, 0.86) 62%,
+    rgba(84, 174, 181, 0.08) 100%
   );
   animation-delay: -7s;
 }
@@ -159,8 +183,12 @@
     border-radius: 32px;
   }
 
+  .brand-lockup {
+    margin-bottom: 22px;
+  }
+
   .banner-title {
-    font-size: clamp(3.3rem, 12vw, 6rem);
+    font-size: clamp(3rem, 10vw, 5.4rem);
   }
 
   .intro {

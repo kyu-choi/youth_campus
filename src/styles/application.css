@@ -9,9 +9,9 @@
 .application-card,
 .application-complete {
   padding: 28px 18px;
-  border: 1px solid rgba(255, 111, 97, 0.16);
+  border: 1px solid rgba(84, 174, 181, 0.16);
   border-radius: 12px;
-  background: rgba(255, 250, 247, 0.9);
+  background: rgba(247, 251, 248, 0.92);
   color: var(--text);
   box-shadow: var(--card-shadow);
 }
@@ -26,6 +26,7 @@
 .application-title {
   margin: 0;
   font-size: clamp(1.7rem, 7vw, 2.5rem);
+  font-weight: 800;
   line-height: 1.2;
   letter-spacing: 0;
 }
@@ -42,7 +43,7 @@
   height: 6px;
   margin-top: 22px;
   border-radius: 999px;
-  background: rgba(255, 111, 97, 0.12);
+  background: rgba(84, 174, 181, 0.12);
   overflow: hidden;
 }
 
@@ -50,7 +51,7 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--coral), var(--lilac-deep));
+  background: linear-gradient(90deg, var(--teal), var(--teal-deep));
   transition: width 180ms ease;
 }
 
@@ -84,8 +85,8 @@
   font: inherit;
   box-shadow:
     rgba(0, 0, 0, 0.12) 0 1px 1px 0,
-    rgba(255, 111, 97, 0.18) 0 0 0 1px,
-    rgba(216, 66, 84, 0.08) 0 2px 5px 0;
+    rgba(84, 174, 181, 0.18) 0 0 0 1px,
+    rgba(45, 127, 135, 0.08) 0 2px 5px 0;
 }
 
 .application-field textarea {
@@ -97,8 +98,8 @@
 .application-field input:focus,
 .application-field textarea:focus {
   box-shadow:
-    rgba(199, 183, 255, 0.48) 0 0 0 4px,
-    rgba(255, 111, 97, 0.24) 0 0 0 1px;
+    rgba(185, 222, 214, 0.58) 0 0 0 4px,
+    rgba(84, 174, 181, 0.24) 0 0 0 1px;
 }
 
 .choice-grid {
@@ -117,8 +118,8 @@
   background: rgba(255, 255, 255, 0.72);
   box-shadow:
     rgba(0, 0, 0, 0.12) 0 1px 1px 0,
-    rgba(255, 111, 97, 0.18) 0 0 0 1px,
-    rgba(216, 66, 84, 0.08) 0 2px 5px 0;
+    rgba(84, 174, 181, 0.18) 0 0 0 1px,
+    rgba(45, 127, 135, 0.08) 0 2px 5px 0;
   cursor: pointer;
   line-height: 1.45;
 }
@@ -154,13 +155,13 @@
 }
 
 .application-back {
-  background: rgba(199, 183, 255, 0.2);
+  background: rgba(185, 222, 214, 0.3);
   color: var(--lilac-deep);
 }
 
 .application-next {
   margin-left: auto;
-  background: linear-gradient(135deg, var(--coral), var(--lilac-deep));
+  background: linear-gradient(135deg, var(--teal), var(--teal-deep));
   color: #fff;
 }
 

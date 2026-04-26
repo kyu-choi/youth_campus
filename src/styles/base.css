@@ -14,13 +14,13 @@ html {
 
 body {
   min-width: 320px;
-  font-family: "Noto Sans KR", "Malgun Gothic", sans-serif;
+  font-family: "IBM Plex Sans KR", "Inter", "Malgun Gothic", sans-serif;
   color: var(--text);
   background:
-    radial-gradient(circle at top left, rgba(255, 229, 138, 0.82), transparent 27%),
-    radial-gradient(circle at top right, rgba(199, 183, 255, 0.62), transparent 25%),
-    radial-gradient(circle at 18% 82%, rgba(57, 198, 192, 0.34), transparent 25%),
-    linear-gradient(160deg, #fffaf7 0%, #fff0f5 42%, #eefcff 100%);
+    radial-gradient(circle at top left, rgba(185, 222, 214, 0.8), transparent 28%),
+    radial-gradient(circle at top right, rgba(84, 174, 181, 0.34), transparent 25%),
+    radial-gradient(circle at 18% 82%, rgba(242, 239, 229, 0.82), transparent 28%),
+    linear-gradient(160deg, #f7fbf8 0%, #eef7f4 48%, #e8f3f5 100%);
   overflow-x: hidden;
 }
 
@@ -28,4 +28,10 @@ body,
 button,
 a {
   -webkit-tap-highlight-color: transparent;
+}
+
+button,
+input,
+textarea {
+  font-family: inherit;
 }
