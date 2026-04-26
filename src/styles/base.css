@@ -16,11 +16,7 @@ body {
   min-width: 320px;
   font-family: "IBM Plex Sans KR", "Inter", "Malgun Gothic", sans-serif;
   color: var(--text);
-  background:
-    radial-gradient(circle at top left, rgba(185, 222, 214, 0.8), transparent 28%),
-    radial-gradient(circle at top right, rgba(84, 174, 181, 0.34), transparent 25%),
-    radial-gradient(circle at 18% 82%, rgba(242, 239, 229, 0.82), transparent 28%),
-    linear-gradient(160deg, #f7fbf8 0%, #eef7f4 48%, #e8f3f5 100%);
+  background: linear-gradient(180deg, #fffdf8 0%, #fff7f5 52%, #f8f7ff 100%);
   overflow-x: hidden;
 }
 

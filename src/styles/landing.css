@@ -42,7 +42,7 @@
   padding: 32px 18px 24px;
   border: 1px solid var(--border);
   border-radius: 26px;
-  background: rgba(247, 251, 248, 0.88);
+  background: rgba(255, 252, 250, 0.9);
   backdrop-filter: blur(12px);
   box-shadow: var(--card-shadow);
   text-align: center;
@@ -81,78 +81,7 @@
 }
 
 .petal {
-  position: absolute;
-  z-index: 0;
-  border-radius: 50%;
-  filter: blur(0.2px);
-  opacity: 0.62;
-  animation: float 12s ease-in-out infinite;
-}
-
-.petal-a {
-  top: 56px;
-  left: -68px;
-  width: 180px;
-  height: 180px;
-  background: radial-gradient(
-    circle at 30% 30%,
-    rgba(255, 255, 255, 0.82),
-    rgba(185, 222, 214, 0.76) 55%,
-    rgba(84, 174, 181, 0.08) 100%
-  );
-}
-
-.petal-b {
-  top: 136px;
-  right: -96px;
-  width: 220px;
-  height: 220px;
-  background: radial-gradient(
-    circle at 35% 30%,
-    rgba(248, 255, 245, 0.92),
-    rgba(84, 174, 181, 0.48) 60%,
-    rgba(45, 127, 135, 0.08) 100%
-  );
-  animation-delay: -3s;
-}
-
-.petal-c {
-  bottom: -44px;
-  left: -24px;
-  width: 132px;
-  height: 132px;
-  background: radial-gradient(
-    circle at 35% 30%,
-    rgba(255, 255, 255, 0.9),
-    rgba(212, 236, 231, 0.82) 58%,
-    rgba(71, 127, 119, 0.08) 100%
-  );
-  animation-delay: -5s;
-}
-
-.petal-d {
-  bottom: 110px;
-  right: -20px;
-  width: 104px;
-  height: 104px;
-  background: radial-gradient(
-    circle at 40% 35%,
-    rgba(255, 255, 255, 0.94),
-    rgba(242, 239, 229, 0.86) 62%,
-    rgba(84, 174, 181, 0.08) 100%
-  );
-  animation-delay: -7s;
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) rotate(0deg);
-  }
-
-  50% {
-    transform: translate3d(0, -12px, 0) rotate(4deg);
-  }
+  display: none;
 }
 
 @media (min-width: 700px) {
@@ -188,35 +117,4 @@
     line-height: 1.8;
   }
 
-  .petal {
-    opacity: 0.75;
-  }
-
-  .petal-a {
-    top: 80px;
-    left: -40px;
-    width: 220px;
-    height: 220px;
-  }
-
-  .petal-b {
-    top: 160px;
-    right: -70px;
-    width: 280px;
-    height: 280px;
-  }
-
-  .petal-c {
-    bottom: -60px;
-    left: 10%;
-    width: 180px;
-    height: 180px;
-  }
-
-  .petal-d {
-    bottom: 90px;
-    right: 12%;
-    width: 130px;
-    height: 130px;
-  }
 }

@@ -7,6 +7,6 @@ window.CheongchunCampus.ui.renderInstagram = function renderInstagram(
 ) {
   elements.instagramLinkLabel.textContent = instagram.label;
   elements.instagramLink.href = instagram.url;
-  elements.instagramBadge.textContent = instagram.badge || "";
-  elements.instagramBadge.hidden = !instagram.badge;
+  elements.instagramBadge.textContent = "";
+  elements.instagramBadge.hidden = true;
 };
