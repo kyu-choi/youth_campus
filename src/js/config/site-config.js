@@ -8,24 +8,25 @@ window.CheongchunCampus.config.staticLandingContent = {
   },
   instagram: {
     label: "인스타그램 바로가기",
-    badge: "인스타그램 바로가기",
+    badge: "",
     url: "https://www.instagram.com/c.c.univ/",
   },
   quickLinks: [
     {
-      id: "blind-date-0502",
-      label: "5/2 소개팅 신청하기",
-      url: "https://docs.google.com/forms/d/107QxDUbSF1JMzKZgYLr2YJnse6bZh3GGAx90Gt911JQ/edit",
+      id: "application",
+      label: "소개팅 신청하기",
+      url: "#application-form",
+      featured: true,
     },
     {
-      id: "blind-date-0516",
-      label: "5/16 소개팅 신청하기",
-      url: "https://docs.google.com/forms/d/107QxDUbSF1JMzKZgYLr2YJnse6bZh3GGAx90Gt911JQ/edit",
+      id: "info",
+      label: "정보 및 문의사항",
+      url: "#info-page",
     },
     {
       id: "reviews",
       label: "후기",
-      url: "https://docs.google.com/forms/d/107QxDUbSF1JMzKZgYLr2YJnse6bZh3GGAx90Gt911JQ/edit",
+      url: "https://www.instagram.com/c.c.univ/",
     },
   ],
   contact: {

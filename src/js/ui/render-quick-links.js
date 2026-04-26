@@ -7,22 +7,34 @@ window.CheongchunCampus.ui.renderQuickLinks = function renderQuickLinks(
 ) {
   elements.linkList.replaceChildren();
 
-  quickLinks.forEach(({ id, label, url }) => {
+  quickLinks.forEach(({ id, label, url, featured }) => {
     const anchor = document.createElement("a");
     const labelText = document.createElement("strong");
-    const icon = document.createElement("span");
+    const isInternalAnchor = url.startsWith("#");
 
-    anchor.className = "link-button";
+    anchor.className = featured ? "link-button link-button-featured" : "link-button";
     anchor.href = url;
-    anchor.target = "_blank";
-    anchor.rel = "noreferrer";
     anchor.dataset.linkId = id;
 
-    labelText.textContent = label;
-    icon.textContent = "↗";
-    icon.setAttribute("aria-hidden", "true");
+    if (!isInternalAnchor) {
+      anchor.target = "_blank";
+      anchor.rel = "noreferrer";
+    }
 
-    anchor.append(labelText, icon);
+    labelText.textContent = label;
+
+    if (isInternalAnchor) {
+      anchor.addEventListener("click", (event) => {
+        event.preventDefault();
+        window.dispatchEvent(
+          new CustomEvent("cheongchun:navigate", {
+            detail: { target: url },
+          })
+        );
+      });
+    }
+
+    anchor.append(labelText);
     elements.linkList.appendChild(anchor);
   });
 };

@@ -6,7 +6,31 @@
   padding-right: max(14px, env(safe-area-inset-right));
   padding-bottom: max(18px, env(safe-area-inset-bottom));
   padding-left: max(14px, env(safe-area-inset-left));
-  overflow: hidden;
+  overflow-x: hidden;
+}
+
+.page-view {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(14px);
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease;
+}
+
+.page-view:not(.is-active) {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  right: max(14px, env(safe-area-inset-right));
+  left: max(14px, env(safe-area-inset-left));
+  visibility: hidden;
+}
+
+.page-view.is-active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+  visibility: visible;
 }
 
 .landing-card {
@@ -18,7 +42,7 @@
   padding: 32px 18px 24px;
   border: 1px solid var(--border);
   border-radius: 26px;
-  background: rgba(247, 255, 252, 0.82);
+  background: rgba(255, 250, 247, 0.84);
   backdrop-filter: blur(12px);
   box-shadow: var(--card-shadow);
 }
@@ -30,7 +54,7 @@
   font-weight: 700;
   line-height: 0.95;
   letter-spacing: -0.04em;
-  color: #226e67;
+  color: var(--coral-deep);
 }
 
 .intro {
@@ -58,8 +82,8 @@
   background: radial-gradient(
     circle at 30% 30%,
     rgba(255, 255, 255, 0.82),
-    rgba(188, 232, 222, 0.78) 55%,
-    rgba(88, 195, 178, 0.08) 100%
+    rgba(255, 183, 161, 0.72) 55%,
+    rgba(255, 111, 97, 0.08) 100%
   );
 }
 
@@ -71,8 +95,8 @@
   background: radial-gradient(
     circle at 35% 30%,
     rgba(248, 255, 245, 0.92),
-    rgba(178, 236, 223, 0.8) 60%,
-    rgba(178, 236, 223, 0.1) 100%
+    rgba(199, 183, 255, 0.68) 60%,
+    rgba(100, 82, 184, 0.08) 100%
   );
   animation-delay: -3s;
 }
@@ -85,8 +109,8 @@
   background: radial-gradient(
     circle at 35% 30%,
     rgba(255, 255, 255, 0.9),
-    rgba(198, 242, 202, 0.8) 58%,
-    rgba(198, 242, 202, 0.08) 100%
+    rgba(158, 232, 200, 0.78) 58%,
+    rgba(57, 198, 192, 0.08) 100%
   );
   animation-delay: -5s;
 }
@@ -99,8 +123,8 @@
   background: radial-gradient(
     circle at 40% 35%,
     rgba(255, 255, 255, 0.94),
-    rgba(88, 195, 178, 0.52) 62%,
-    rgba(88, 195, 178, 0.08) 100%
+    rgba(255, 229, 138, 0.72) 62%,
+    rgba(255, 111, 97, 0.08) 100%
   );
   animation-delay: -7s;
 }
@@ -122,6 +146,12 @@
     padding-right: 24px;
     padding-bottom: 24px;
     padding-left: 24px;
+  }
+
+  .page-view:not(.is-active) {
+    top: 24px;
+    right: 24px;
+    left: 24px;
   }
 
   .landing-card {

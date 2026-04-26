@@ -9,6 +9,7 @@ window.CheongchunCampus.ui.renderApplicationForm =
 
     let currentPage = 0;
     const values = {};
+    const files = {};
 
     function getFieldValue(field) {
       if (field.type === "checkbox") {
@@ -66,8 +67,18 @@ window.CheongchunCampus.ui.renderApplicationForm =
         const input = fieldNode.querySelector("input, textarea");
 
         if (field.type === "file") {
-          const files = Array.from(input?.files || []).map((file) => file.name);
-          setFieldValue(field, field.multiple ? files : files[0] || "");
+          const selectedFiles = Array.from(input?.files || []);
+          if (selectedFiles.length === 0 && getFieldValue(field)) {
+            return;
+          }
+
+          files[field.name] = selectedFiles;
+          setFieldValue(
+            field,
+            field.multiple
+              ? selectedFiles.map((file) => file.name)
+              : selectedFiles[0]?.name || ""
+          );
           return;
         }
 
@@ -154,6 +165,7 @@ window.CheongchunCampus.ui.renderApplicationForm =
     function renderSuccess() {
       mount.innerHTML = "";
 
+      const homeButton = createHomeButton();
       const success = document.createElement("section");
       const title = document.createElement("h2");
       const message = document.createElement("p");
@@ -163,8 +175,26 @@ window.CheongchunCampus.ui.renderApplicationForm =
       message.textContent = config.successMessage;
 
       success.append(title, message);
-      mount.appendChild(success);
+      mount.append(homeButton, success);
       mount.scrollIntoView({ block: "start", behavior: "smooth" });
+    }
+
+    function createHomeButton() {
+      const button = document.createElement("button");
+
+      button.className = "home-button";
+      button.type = "button";
+      button.textContent = "홈";
+      button.dataset.homeButton = "";
+      button.addEventListener("click", () => {
+        window.dispatchEvent(
+          new CustomEvent("cheongchun:navigate", {
+            detail: { target: "#" },
+          })
+        );
+      });
+
+      return button;
     }
 
     async function submit() {
@@ -179,7 +209,7 @@ window.CheongchunCampus.ui.renderApplicationForm =
       submitButton.textContent = "제출 중";
 
       try {
-        await window.CheongchunCampus.services.submitApplication(values);
+        await window.CheongchunCampus.services.submitApplication(values, files);
         renderSuccess();
       } catch (error) {
         console.error("Application submit failed.", error);
@@ -203,6 +233,7 @@ window.CheongchunCampus.ui.renderApplicationForm =
       const back = document.createElement("button");
       const next = document.createElement("button");
       const error = document.createElement("p");
+      const homeButton = createHomeButton();
       const isLastPage = currentPage === config.pages.length - 1;
 
       mount.innerHTML = "";
@@ -259,7 +290,7 @@ window.CheongchunCampus.ui.renderApplicationForm =
       header.append(eyebrow, title, description, progress);
       actions.append(back, next);
       section.append(header, fields, error, actions);
-      mount.appendChild(section);
+      mount.append(homeButton, section);
     }
 
     render();

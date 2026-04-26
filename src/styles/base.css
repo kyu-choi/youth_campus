@@ -17,9 +17,10 @@ body {
   font-family: "Noto Sans KR", "Malgun Gothic", sans-serif;
   color: var(--text);
   background:
-    radial-gradient(circle at top left, rgba(244, 255, 210, 0.92), transparent 28%),
-    radial-gradient(circle at top right, rgba(203, 244, 234, 0.88), transparent 24%),
-    linear-gradient(160deg, #f7fffb 0%, #effcf8 42%, #eef9ff 100%);
+    radial-gradient(circle at top left, rgba(255, 229, 138, 0.82), transparent 27%),
+    radial-gradient(circle at top right, rgba(199, 183, 255, 0.62), transparent 25%),
+    radial-gradient(circle at 18% 82%, rgba(57, 198, 192, 0.34), transparent 25%),
+    linear-gradient(160deg, #fffaf7 0%, #fff0f5 42%, #eefcff 100%);
   overflow-x: hidden;
 }
 

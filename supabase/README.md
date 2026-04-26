@@ -34,8 +34,18 @@
 - `application_submissions`
   - `applicant_name`
   - `applicant_phone`
+  - `kakao_id`
+  - `gender`
+  - `birth_year`
+  - `region`
+  - `school`
+  - `program_type`
+  - `participation_type`
   - `preferred_date`
   - `payload` (신청서 전체 응답 JSON)
   - `created_at`
 
 신청서 제출 저장용 SQL은 `migrations/202604260001_application_submissions.sql`에 추가했습니다.
+
+첨부 파일은 `application-files` Storage bucket에 저장하고, 각 파일의 bucket/path/name/size/type은
+`application_submissions.payload.uploaded_files`에 같이 저장합니다.

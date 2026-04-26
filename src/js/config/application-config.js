@@ -2,9 +2,9 @@ window.CheongchunCampus = window.CheongchunCampus || {};
 window.CheongchunCampus.config = window.CheongchunCampus.config || {};
 
 window.CheongchunCampus.config.applicationForm = {
-  title: "[이음 로테이션 소개팅 신청서]",
+  title: "[청춘 캠퍼스 로테이션 소개팅 신청서]",
   description:
-    "이음 로테이션 소개팅 신청을 위한 기본 정보와 선호 내용을 작성해주세요.",
+    "청춘 캠퍼스 로테이션 소개팅 신청을 위한 기본 정보와 선호 내용을 작성해주세요.",
   privacyText:
     "수집 항목: 이름, 연락처, 거주지, 직장, 사진 등 신청서에 기입된 사항. 목적: 소개팅 선정자 안내 및 신원 확인. 보유 기간: 신청일로부터 5년 후 폐기.",
   submitLabel: "신청완료",
@@ -14,18 +14,32 @@ window.CheongchunCampus.config.applicationForm = {
   pages: [
     {
       eyebrow: "기본 정보",
-      title: "본인 확인 정보를 입력해주세요.",
+      title: "신청자 기본 정보를 입력해주세요.",
       fields: [
         {
           name: "name",
           label: "성함",
           type: "text",
-          placeholder: "김이음",
+          placeholder: "김청춘",
           required: true,
         },
         {
+          name: "region",
+          label: "신청 지역",
+          type: "choice",
+          required: true,
+          options: ["대구"],
+        },
+        {
+          name: "program_type",
+          label: "신청 프로그램",
+          type: "choice",
+          required: true,
+          options: ["다대다 로테이션 소개팅", "1:1 카톡 소개팅"],
+        },
+        {
           name: "birth_year",
-          label: "태어난 년도",
+          label: "출생년도",
           type: "number",
           placeholder: "1998",
           required: true,
@@ -45,6 +59,13 @@ window.CheongchunCampus.config.applicationForm = {
           options: ["남성", "여성"],
         },
         {
+          name: "kakao_id",
+          label: "카카오톡 ID",
+          type: "text",
+          placeholder: "카카오톡 ID를 입력해주세요.",
+          required: true,
+        },
+        {
           name: "privacy_confirmed",
           label: "개인정보 수집 및 이용 안내를 확인했습니다.",
           type: "checkbox",
@@ -53,8 +74,8 @@ window.CheongchunCampus.config.applicationForm = {
       ],
     },
     {
-      eyebrow: "참여 일정",
-      title: "참여 희망 날짜를 선택해주세요.",
+      eyebrow: "신청 유형",
+      title: "희망 프로그램과 일정을 선택해주세요.",
       fields: [
         {
           name: "preferred_date",
@@ -62,34 +83,42 @@ window.CheongchunCampus.config.applicationForm = {
           type: "choice",
           required: true,
           options: [
-            "5월 10일 (일) 오후 2시",
-            "5월 24일 (일) 오후 2시",
-            "5월 10일 (일) 오후 7시",
-            "5월 17일 (일) 오후 7시",
-            "5월 8일 (금) 오후 8시",
-            "5월 15일 (금) 오후 8시",
-            "5월 17일 (일) 오후 2시",
+            "5월 2일 (토) 오후 1시",
           ],
         },
         {
           name: "participation_type",
-          label: "재참여 여부",
+          label: "신청유형",
           type: "choice",
           required: true,
-          options: ["신규", "재참여"],
+          options: ["신규 신청", "재신청"],
         },
         {
           name: "companion_name",
-          label: "동반참여자 성함",
+          label: "지인 동반 신청자 성함",
           type: "text",
-          placeholder: "00년생 김이음",
+          placeholder: "친구와 함께 신청하는 경우에만 작성해주세요.",
         },
       ],
     },
     {
       eyebrow: "프로필",
-      title: "매칭에 필요한 정보를 알려주세요.",
+      title: "학교와 프로필 정보를 알려주세요.",
       fields: [
+        {
+          name: "school",
+          label: "학교명",
+          type: "text",
+          placeholder: "경북대",
+          required: true,
+        },
+        {
+          name: "major",
+          label: "학과",
+          type: "text",
+          placeholder: "경영학과",
+          required: true,
+        },
         {
           name: "residence",
           label: "거주지 (시/구)",
@@ -99,9 +128,9 @@ window.CheongchunCampus.config.applicationForm = {
         },
         {
           name: "job",
-          label: "현재 하고 계신 일",
+          label: "현재 상태",
           type: "text",
-          placeholder: "00회사 사무직 / 00병원 간호사",
+          placeholder: "재학 / 휴학 / 졸업예정 / 직장 병행 등",
           required: true,
         },
         {
@@ -136,7 +165,7 @@ window.CheongchunCampus.config.applicationForm = {
     },
     {
       eyebrow: "선호",
-      title: "희망 조건과 피하고 싶은 상황을 적어주세요.",
+      title: "매칭 선호 정보를 적어주세요.",
       fields: [
         {
           name: "preferred_age",
@@ -155,7 +184,20 @@ window.CheongchunCampus.config.applicationForm = {
           name: "avoided_person",
           label: "마주치지 않고 싶은 지인",
           type: "textarea",
-          placeholder: "94년생 00회사 김이음",
+          placeholder: "94년생 00회사 김청춘",
+        },
+        {
+          name: "ideal_type",
+          label: "선호하는 이상형",
+          type: "textarea",
+          placeholder: "성격, 분위기, 가치관 등 자유롭게 적어주세요.",
+        },
+        {
+          name: "self_intro",
+          label: "간단한 자기소개",
+          type: "textarea",
+          placeholder: "매칭에 참고할 수 있는 본인의 장점이나 취향을 적어주세요.",
+          required: true,
         },
       ],
     },
@@ -192,7 +234,7 @@ window.CheongchunCampus.config.applicationForm = {
       fields: [
         {
           name: "employment_file_names",
-          label: "재직 또는 재학 증빙 자료",
+          label: "학생증 또는 재학증명서",
           type: "file",
           required: true,
         },
@@ -210,23 +252,30 @@ window.CheongchunCampus.config.applicationForm = {
       title: "마지막 동의 내용을 확인해주세요.",
       fields: [
         {
-          name: "single_confirmed",
+          name: "student_status_confirmed",
           label:
-            "현재 미혼이며 과거 혼인 및 이혼 경력, 사실혼, 법적 혼인 관계에 해당되지 않음을 확인합니다.",
+            "현재 대학(원)생이며, 재학 또는 휴학 상태임을 확인합니다. (졸업생 및 직장인은 해당 모임 대상이 아닙니다.)",
           type: "checkbox",
           required: true,
         },
         {
           name: "after_meeting_confirmed",
           label:
-            "모임 이후 개인 연락, 만남, 재연결 요청 등에 대해 주최자가 관여하거나 책임지지 않음을 확인합니다.",
+            "모임 이후 이루어지는 개인 연락, 추가 만남, 재연결 요청 등에 대해서는 주최 측이 관여하거나 책임지지 않음을 확인합니다.",
           type: "checkbox",
           required: true,
         },
         {
           name: "refund_confirmed",
           label:
-            "환불 규정과 일정 변경 규정을 확인했습니다. 7일 전 100%, 6~4일 전 50%, 3일 전부터 당일은 환불 불가입니다.",
+            "환불 및 일정 변경 규정을 확인했습니다. 행사 7일 전까지는 100% 환불, 6~4일 전까지는 50% 환불 가능하며, 행사 3일 전부터 당일 취소는 환불이 불가합니다.",
+          type: "checkbox",
+          required: true,
+        },
+        {
+          name: "kakao_required_confirmed",
+          label:
+            "신청서 제출 후, 청춘 캠퍼스 공식 카카오톡 채널로 지역 / 이름 / 학교 / 신청 유형을 보내야 최종 접수가 완료됨을 확인했습니다.",
           type: "checkbox",
           required: true,
         },

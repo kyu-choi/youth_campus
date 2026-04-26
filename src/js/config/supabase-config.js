@@ -8,4 +8,5 @@ window.CheongchunCampus.config.supabaseConfig = {
   landingContentTable: "landing_content",
   landingLinksTable: "landing_links",
   applicationSubmissionsTable: "application_submissions",
+  applicationFilesBucket: "application-files",
 };

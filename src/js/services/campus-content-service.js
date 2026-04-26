@@ -20,6 +20,9 @@ function mergeSupabaseContent(contentRow, linkRows) {
             id: linkRow.id ?? linkRow.label,
             label: linkRow.label,
             url: linkRow.url,
+            featured: Boolean(
+              linkRow.featured ?? linkRow.id === "application"
+            ),
           }))
         : staticLandingContent.quickLinks,
     contact: {
