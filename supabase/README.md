@@ -31,3 +31,11 @@
   - `url`
   - `sort_order`
   - `is_active`
+- `application_submissions`
+  - `applicant_name`
+  - `applicant_phone`
+  - `preferred_date`
+  - `payload` (신청서 전체 응답 JSON)
+  - `created_at`
+
+신청서 제출 저장용 SQL은 `migrations/202604260001_application_submissions.sql`에 추가했습니다.

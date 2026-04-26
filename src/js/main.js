@@ -9,6 +9,10 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     window.CheongchunCampus.ui.renderInstagram(content.instagram, elements);
     window.CheongchunCampus.ui.renderQuickLinks(content.quickLinks, elements);
     window.CheongchunCampus.ui.renderContact(content.contact, elements);
+    window.CheongchunCampus.ui.renderApplicationForm(
+      window.CheongchunCampus.config.applicationForm,
+      document.getElementById("application-form")
+    );
   } catch (error) {
     console.error("Landing page bootstrap failed.", error);
   }

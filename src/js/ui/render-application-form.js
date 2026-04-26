@@ -1,0 +1,266 @@
+window.CheongchunCampus = window.CheongchunCampus || {};
+window.CheongchunCampus.ui = window.CheongchunCampus.ui || {};
+
+window.CheongchunCampus.ui.renderApplicationForm =
+  function renderApplicationForm(config, mount) {
+    if (!mount) {
+      return;
+    }
+
+    let currentPage = 0;
+    const values = {};
+
+    function getFieldValue(field) {
+      if (field.type === "checkbox") {
+        return Boolean(values[field.name]);
+      }
+
+      if (Array.isArray(values[field.name])) {
+        return values[field.name].length > 0;
+      }
+
+      return values[field.name] || "";
+    }
+
+    function setFieldValue(field, value) {
+      values[field.name] = field.type === "checkbox" ? Boolean(value) : value;
+    }
+
+    function validatePage() {
+      mount
+        .querySelectorAll(".application-field.is-invalid")
+        .forEach((node) => node.classList.remove("is-invalid"));
+
+      const missingField = config.pages[currentPage].fields.find((field) => {
+        if (!field.required) {
+          return false;
+        }
+
+        return !getFieldValue(field);
+      });
+
+      if (missingField) {
+        const target = mount.querySelector(`[data-field="${missingField.name}"]`);
+        target?.classList.add("is-invalid");
+        target?.scrollIntoView({ block: "center", behavior: "smooth" });
+        return false;
+      }
+
+      return true;
+    }
+
+    function collectVisibleInputs() {
+      config.pages[currentPage].fields.forEach((field) => {
+        const fieldNode = mount.querySelector(`[data-field="${field.name}"]`);
+
+        if (!fieldNode) {
+          return;
+        }
+
+        if (field.type === "choice") {
+          const selected = fieldNode.querySelector("input:checked");
+          setFieldValue(field, selected?.value || "");
+          return;
+        }
+
+        const input = fieldNode.querySelector("input, textarea");
+
+        if (field.type === "file") {
+          const files = Array.from(input?.files || []).map((file) => file.name);
+          setFieldValue(field, field.multiple ? files : files[0] || "");
+          return;
+        }
+
+        setFieldValue(
+          field,
+          field.type === "checkbox" ? input?.checked : input?.value.trim()
+        );
+      });
+    }
+
+    function createField(field) {
+      const wrapper = document.createElement("div");
+      const label = document.createElement("label");
+      const required = field.required ? " *" : "";
+
+      wrapper.className = `application-field application-field-${field.type}`;
+      wrapper.dataset.field = field.name;
+      label.className = "application-label";
+      label.textContent = `${field.label}${required}`;
+
+      if (field.type === "choice") {
+        const choices = document.createElement("div");
+        choices.className = "choice-grid";
+
+        field.options.forEach((option) => {
+          const choice = document.createElement("label");
+          const input = document.createElement("input");
+          const text = document.createElement("span");
+
+          choice.className = "choice-option";
+          input.type = "radio";
+          input.name = field.name;
+          input.value = option;
+          input.checked = values[field.name] === option;
+          text.textContent = option;
+
+          choice.append(input, text);
+          choices.appendChild(choice);
+        });
+
+        wrapper.append(label, choices);
+        return wrapper;
+      }
+
+      if (field.type === "checkbox") {
+        const checkbox = document.createElement("label");
+        const input = document.createElement("input");
+        const text = document.createElement("span");
+
+        checkbox.className = "consent-option";
+        input.type = "checkbox";
+        input.name = field.name;
+        input.checked = Boolean(values[field.name]);
+        text.textContent = field.label;
+
+        checkbox.append(input, text);
+        wrapper.append(checkbox);
+        return wrapper;
+      }
+
+      const input =
+        field.type === "textarea"
+          ? document.createElement("textarea")
+          : document.createElement("input");
+
+      if (field.type !== "textarea") {
+        input.type = field.type;
+      }
+
+      input.name = field.name;
+      input.placeholder = field.placeholder || "";
+      input.required = Boolean(field.required);
+
+      if (field.type === "file") {
+        input.multiple = Boolean(field.multiple);
+      } else {
+        input.value = values[field.name] || "";
+      }
+
+      wrapper.append(label, input);
+      return wrapper;
+    }
+
+    function renderSuccess() {
+      mount.innerHTML = "";
+
+      const success = document.createElement("section");
+      const title = document.createElement("h2");
+      const message = document.createElement("p");
+
+      success.className = "application-complete";
+      title.textContent = config.successTitle;
+      message.textContent = config.successMessage;
+
+      success.append(title, message);
+      mount.appendChild(success);
+      mount.scrollIntoView({ block: "start", behavior: "smooth" });
+    }
+
+    async function submit() {
+      collectVisibleInputs();
+
+      if (!validatePage()) {
+        return;
+      }
+
+      const submitButton = mount.querySelector(".application-next");
+      submitButton.disabled = true;
+      submitButton.textContent = "제출 중";
+
+      try {
+        await window.CheongchunCampus.services.submitApplication(values);
+        renderSuccess();
+      } catch (error) {
+        console.error("Application submit failed.", error);
+        submitButton.disabled = false;
+        submitButton.textContent = config.submitLabel;
+        mount.querySelector(".application-error").hidden = false;
+      }
+    }
+
+    function render() {
+      const page = config.pages[currentPage];
+      const section = document.createElement("section");
+      const header = document.createElement("div");
+      const eyebrow = document.createElement("p");
+      const title = document.createElement("h2");
+      const description = document.createElement("p");
+      const progress = document.createElement("div");
+      const progressBar = document.createElement("span");
+      const fields = document.createElement("div");
+      const actions = document.createElement("div");
+      const back = document.createElement("button");
+      const next = document.createElement("button");
+      const error = document.createElement("p");
+      const isLastPage = currentPage === config.pages.length - 1;
+
+      mount.innerHTML = "";
+      section.className = "application-card";
+      header.className = "application-header";
+      eyebrow.className = "application-eyebrow";
+      title.className = "application-title";
+      description.className = "application-description";
+      progress.className = "application-progress";
+      progressBar.style.width = `${((currentPage + 1) / config.pages.length) * 100}%`;
+      fields.className = "application-fields";
+      actions.className = "application-actions";
+      back.className = "application-back";
+      next.className = "application-next";
+      error.className = "application-error";
+      error.hidden = true;
+
+      eyebrow.textContent = `${page.eyebrow} · ${currentPage + 1}/${config.pages.length}`;
+      title.textContent = currentPage === 0 ? config.title : page.title;
+      description.textContent =
+        currentPage === 0 ? `${page.title}\n\n${config.privacyText}` : config.description;
+      back.type = "button";
+      back.textContent = "이전";
+      back.disabled = currentPage === 0;
+      next.type = "button";
+      next.textContent = isLastPage ? config.submitLabel : "다음";
+      error.textContent = "제출 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.";
+
+      page.fields.forEach((field) => fields.appendChild(createField(field)));
+
+      back.addEventListener("click", () => {
+        collectVisibleInputs();
+        currentPage -= 1;
+        render();
+      });
+
+      next.addEventListener("click", () => {
+        collectVisibleInputs();
+
+        if (!validatePage()) {
+          return;
+        }
+
+        if (isLastPage) {
+          submit();
+          return;
+        }
+
+        currentPage += 1;
+        render();
+      });
+
+      progress.appendChild(progressBar);
+      header.append(eyebrow, title, description, progress);
+      actions.append(back, next);
+      section.append(header, fields, error, actions);
+      mount.appendChild(section);
+    }
+
+    render();
+  };
