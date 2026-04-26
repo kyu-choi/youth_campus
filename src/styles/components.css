@@ -1,17 +1,17 @@
 .instagram-card,
 .link-section {
-  margin-top: 28px;
-  padding: 24px;
-  border-radius: 24px;
+  margin-top: 20px;
+  padding: 18px;
+  border-radius: 20px;
   background: rgba(255, 255, 255, 0.68);
   border: 1px solid rgba(255, 255, 255, 0.78);
 }
 
 .instagram-card {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
 }
 
 .section-label {
@@ -27,9 +27,10 @@
   display: inline-block;
   margin-top: 10px;
   color: var(--teal-deep);
-  font-size: clamp(1.15rem, 3vw, 1.45rem);
+  font-size: clamp(1.08rem, 5vw, 1.35rem);
   font-weight: 600;
   text-decoration: none;
+  word-break: keep-all;
 }
 
 .instagram-link:hover,
@@ -39,7 +40,12 @@
 }
 
 .instagram-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
   flex-shrink: 0;
+  min-height: 42px;
   padding: 10px 16px;
   border-radius: 999px;
   background: linear-gradient(
@@ -55,8 +61,8 @@
 
 .link-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 14px;
+  grid-template-columns: 1fr;
+  gap: 12px;
 }
 
 .link-button {
@@ -64,8 +70,9 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 18px 20px;
-  border-radius: 20px;
+  min-height: 64px;
+  padding: 17px 18px;
+  border-radius: 18px;
   color: var(--text);
   background: linear-gradient(
     135deg,
@@ -75,6 +82,7 @@
   border: 1px solid rgba(111, 191, 154, 0.35);
   text-decoration: none;
   font-weight: 600;
+  font-size: 1rem;
   box-shadow: 0 14px 24px rgba(29, 123, 114, 0.08);
   transition:
     transform 180ms ease,
@@ -101,9 +109,9 @@
 }
 
 .contact-footer {
-  margin: 28px 0 0;
+  margin: 24px 0 0;
   color: var(--muted);
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   line-height: 1.7;
   text-align: center;
 }
@@ -118,4 +126,40 @@
 .contact-link:focus-visible {
   text-decoration: underline;
   text-underline-offset: 4px;
+}
+
+@media (min-width: 700px) {
+  .instagram-card,
+  .link-section {
+    margin-top: 28px;
+    padding: 24px;
+    border-radius: 24px;
+  }
+
+  .instagram-card {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .instagram-link {
+    font-size: clamp(1.15rem, 3vw, 1.45rem);
+  }
+
+  .link-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .link-button {
+    min-height: 0;
+    padding: 18px 20px;
+    border-radius: 20px;
+  }
+
+  .contact-footer {
+    margin-top: 28px;
+    font-size: 0.95rem;
+  }
 }
