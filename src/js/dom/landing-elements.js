@@ -6,6 +6,7 @@ window.CheongchunCampus.dom.getLandingElements = function getLandingElements() {
     heroTitle: document.getElementById("hero-title"),
     heroSubtitle: document.getElementById("hero-subtitle"),
     instagramLink: document.getElementById("instagram-link"),
+    instagramLinkLabel: document.getElementById("instagram-link-label"),
     instagramBadge: document.getElementById("instagram-badge"),
     linkList: document.getElementById("link-list"),
     contactPrefix: document.getElementById("contact-prefix"),
