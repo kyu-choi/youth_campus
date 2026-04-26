@@ -59,16 +59,7 @@
   display: block;
   width: clamp(104px, 34vw, 148px);
   height: auto;
-  border-radius: 50%;
   filter: drop-shadow(0 18px 28px rgba(45, 127, 135, 0.2));
-}
-
-.brand-tagline {
-  margin: 0;
-  color: var(--mint-deep);
-  font-size: clamp(0.78rem, 3.4vw, 0.92rem);
-  font-weight: 700;
-  letter-spacing: 0.02em;
 }
 
 .banner-title {
