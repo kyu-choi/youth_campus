@@ -41,7 +41,6 @@ window.CheongchunCampus.services.submitApplication =
         height: toNullableNumber(payload.height),
         weight: toNullableNumber(payload.weight),
         smoking: payload.smoking,
-        religion: payload.religion,
         program_type: payload.program_type,
         participation_type: payload.participation_type,
         preferred_date: payload.preferred_date,

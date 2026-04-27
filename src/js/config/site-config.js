@@ -32,7 +32,7 @@ window.CheongchunCampus.config.staticLandingContent = {
   contact: {
     prefix: "개인적인 문의는 ",
     linkLabel: "카카오톡 채널",
-    url: "http://pf.kakao.com/_DGhCX",
+    url: "http://pf.kakao.com/_BxcVTX",
     suffix: "로 연락 주세요.",
   },
 };

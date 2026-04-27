@@ -83,7 +83,13 @@ window.CheongchunCampus.config.applicationForm = {
           type: "choice",
           required: true,
           options: [
-            "5월 2일 (토) 오후 1시",
+            {
+              value: "5월 2일 (토) 오후 3시",
+              label: "5월 2일 (토) 오후 3시",
+              badge: "(마감)",
+              badgeTone: "danger",
+            },
+            "5월 9일 (토) 오후 3시",
           ],
         },
         {
@@ -154,13 +160,6 @@ window.CheongchunCampus.config.applicationForm = {
           required: true,
           options: ["비흡연자에요", "전자담배를 피워요", "가끔 피워요", "매일 피워요"],
         },
-        {
-          name: "religion",
-          label: "종교",
-          type: "choice",
-          required: true,
-          options: ["무교", "기독교", "천주교", "불교", "기타"],
-        },
       ],
     },
     {
@@ -184,7 +183,7 @@ window.CheongchunCampus.config.applicationForm = {
           name: "avoided_person",
           label: "마주치지 않고 싶은 지인",
           type: "textarea",
-          placeholder: "94년생 00회사 김청춘",
+          placeholder: "경북대학교 김청춘",
         },
         {
           name: "ideal_type",

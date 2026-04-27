@@ -104,6 +104,8 @@ window.CheongchunCampus.ui.renderApplicationForm =
         choices.className = "choice-grid";
 
         field.options.forEach((option) => {
+          const optionConfig =
+            typeof option === "string" ? { value: option, label: option } : option;
           const choice = document.createElement("label");
           const input = document.createElement("input");
           const text = document.createElement("span");
@@ -111,9 +113,19 @@ window.CheongchunCampus.ui.renderApplicationForm =
           choice.className = "choice-option";
           input.type = "radio";
           input.name = field.name;
-          input.value = option;
-          input.checked = values[field.name] === option;
-          text.textContent = option;
+          input.value = optionConfig.value;
+          input.checked = values[field.name] === optionConfig.value;
+          text.className = "choice-option-text";
+          text.textContent = optionConfig.label;
+
+          if (optionConfig.badge) {
+            const badge = document.createElement("span");
+            badge.className = `choice-option-badge ${
+              optionConfig.badgeTone ? `is-${optionConfig.badgeTone}` : ""
+            }`.trim();
+            badge.textContent = optionConfig.badge;
+            text.appendChild(badge);
+          }
 
           choice.append(input, text);
           choices.appendChild(choice);

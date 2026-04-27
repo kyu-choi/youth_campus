@@ -50,7 +50,6 @@
   - `height`
   - `weight`
   - `smoking`
-  - `religion`
   - `program_type`
   - `participation_type`
   - `preferred_date`
@@ -84,6 +83,8 @@
    - 관리자 로그인 이메일 테이블, 관리자 확인 함수, RLS 정책 생성
 4. `migrations/202604270006_drop_unused_admin_views.sql`
    - 예전에 만든 View와 별도 매칭 테이블이 있다면 삭제
+5. `migrations/202604270007_update_application_content.sql`
+   - 카카오톡 채널 URL과 기존 5월 2일 일정 값을 최신 내용으로 보정
 
 새 Supabase 프로젝트라면 4번은 실행해도 되고 생략해도 됩니다.
 이미 예전 SQL을 실행해서 View나 `application_matches`가 보인다면 4번을 실행하면 정리됩니다.
