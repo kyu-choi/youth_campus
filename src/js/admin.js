@@ -1,0 +1,788 @@
+window.CheongchunCampus = window.CheongchunCampus || {};
+
+(function setupAdminPage() {
+  const client = window.CheongchunCampus.services.getSupabaseClient();
+
+  const state = {
+    rows: [],
+    filteredRows: [],
+    selectedRow: null,
+    selectedMale: null,
+    selectedFemale: null,
+    sortKey: "submitted_at",
+    sortDirection: "desc",
+  };
+
+  const elements = {
+    loginPanel: document.getElementById("login-panel"),
+    adminPanel: document.getElementById("admin-panel"),
+    loginForm: document.getElementById("login-form"),
+    loginEmail: document.getElementById("login-email"),
+    loginPassword: document.getElementById("login-password"),
+    loginMessage: document.getElementById("login-message"),
+    logoutButton: document.getElementById("logout-button"),
+    adminEmail: document.getElementById("admin-email"),
+    totalCount: document.getElementById("total-count"),
+    maleCount: document.getElementById("male-count"),
+    femaleCount: document.getElementById("female-count"),
+    paidCount: document.getElementById("paid-count"),
+    unpaidCount: document.getElementById("unpaid-count"),
+    candidateCount: document.getElementById("candidate-count"),
+    matchedCount: document.getElementById("matched-count"),
+    reviewNeededCount: document.getElementById("review-needed-count"),
+    tableCaption: document.getElementById("table-caption"),
+    searchInput: document.getElementById("search-input"),
+    dateFilter: document.getElementById("date-filter"),
+    genderFilter: document.getElementById("gender-filter"),
+    statusFilter: document.getElementById("status-filter"),
+    paymentFilter: document.getElementById("payment-filter"),
+    matchingFilter: document.getElementById("matching-filter"),
+    refreshButton: document.getElementById("refresh-button"),
+    tableBody: document.getElementById("response-table-body"),
+    emptyDetail: document.getElementById("empty-detail"),
+    detailContent: document.getElementById("detail-content"),
+    reviewForm: document.getElementById("review-form"),
+    reviewStatus: document.getElementById("review-status"),
+    paymentStatus: document.getElementById("payment-status"),
+    matchingStatus: document.getElementById("matching-status"),
+    reviewScore: document.getElementById("review-score"),
+    reviewGroup: document.getElementById("review-group"),
+    reviewNote: document.getElementById("review-note"),
+    reviewMessage: document.getElementById("review-message"),
+    selectedMale: document.getElementById("selected-male"),
+    selectedFemale: document.getElementById("selected-female"),
+    matchForm: document.getElementById("match-form"),
+    matchDate: document.getElementById("match-date"),
+    matchProgram: document.getElementById("match-program"),
+    matchGroup: document.getElementById("match-group"),
+    matchNote: document.getElementById("match-note"),
+    matchMessage: document.getElementById("match-message"),
+    responseSummary: document.getElementById("response-summary"),
+    drinkSummary: document.getElementById("drink-summary"),
+  };
+
+  if (!client) {
+    setMessage(elements.loginMessage, "Supabase 설정을 확인해주세요.", true);
+    return;
+  }
+
+  function setMessage(target, message, isError = false) {
+    target.textContent = message;
+    target.classList.toggle("is-error", isError);
+  }
+
+  function formatDateTime(value) {
+    if (!value) {
+      return "";
+    }
+
+    return new Intl.DateTimeFormat("ko-KR", {
+      dateStyle: "short",
+      timeStyle: "short",
+    }).format(new Date(value));
+  }
+
+  function getStatusLabel(status) {
+    return (
+      {
+        new: "신규",
+        reviewed: "검토",
+        matched: "매칭",
+        rejected: "제외",
+        cancelled: "취소",
+      }[status] || status || "신규"
+    );
+  }
+
+  function getPaymentLabel(status) {
+    return (
+      {
+        unpaid: "미입금",
+        deposit_paid: "예약금",
+        paid: "입금완료",
+        refunded: "환불",
+        waived: "면제",
+      }[status] || status || "미입금"
+    );
+  }
+
+  function getMatchingLabel(status) {
+    return (
+      {
+        unmatched: "미매칭",
+        candidate: "후보",
+        matched: "매칭완료",
+        notified: "안내완료",
+        cancelled: "취소",
+      }[status] || status || "미매칭"
+    );
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function showLogin() {
+    elements.loginPanel.hidden = false;
+    elements.adminPanel.hidden = true;
+    elements.logoutButton.hidden = true;
+    elements.adminEmail.textContent = "";
+  }
+
+  function showAdmin(email) {
+    elements.loginPanel.hidden = true;
+    elements.adminPanel.hidden = false;
+    elements.logoutButton.hidden = false;
+    elements.adminEmail.textContent = email;
+  }
+
+  async function requireAdmin() {
+    const { data: sessionData } = await client.auth.getSession();
+    const session = sessionData.session;
+
+    if (!session) {
+      showLogin();
+      return false;
+    }
+
+    const { data, error } = await client.rpc("is_application_admin");
+    if (error || data !== true) {
+      await client.auth.signOut();
+      showLogin();
+      setMessage(
+        elements.loginMessage,
+        "관리자 권한이 없습니다. admin_users 테이블에 이메일을 등록해주세요.",
+        true
+      );
+      return false;
+    }
+
+    showAdmin(session.user.email);
+    return true;
+  }
+
+  async function loadData() {
+    setMessage(elements.reviewMessage, "신청자 정보를 불러오는 중입니다.");
+
+    const responses = await client
+      .from("application_submissions")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (responses.error) {
+      setMessage(elements.reviewMessage, responses.error.message, true);
+      return;
+    }
+
+    state.rows = (responses.data || []).map(normalizeSubmission);
+    renderDateOptions();
+    applyFilters();
+    renderSummary();
+    setMessage(elements.reviewMessage, "");
+  }
+
+  function normalizeSubmission(row) {
+    const payload = row.payload || {};
+    const uploadedFiles = payload.uploaded_files || {};
+    const phone = row.phone || row.applicant_phone || payload.phone || "";
+    const phoneConfirm = row.phone_confirm || payload.phone_confirm || "";
+    const birthYear = row.birth_year ? Number(row.birth_year) : null;
+
+    return {
+      ...row,
+      submitted_at: row.created_at,
+      name: row.name || row.applicant_name || payload.name || "",
+      phone,
+      phone_confirm: phoneConfirm,
+      phone_mismatch: Boolean(phone && phoneConfirm && phone !== phoneConfirm),
+      kakao_id: row.kakao_id || payload.kakao_id || "",
+      gender: row.gender || payload.gender || "",
+      birth_year: birthYear,
+      age: birthYear ? new Date().getFullYear() - birthYear + 1 : "",
+      region: row.region || payload.region || "",
+      program_type: row.program_type || payload.program_type || "",
+      preferred_date: row.preferred_date || payload.preferred_date || "",
+      participation_type:
+        row.participation_type || payload.participation_type || "",
+      companion_name: row.companion_name || payload.companion_name || "",
+      school: row.school || payload.school || "",
+      major: row.major || payload.major || "",
+      residence: row.residence || payload.residence || "",
+      job: row.job || payload.job || "",
+      height_cm: row.height || payload.height || "",
+      weight_kg: row.weight || payload.weight || "",
+      smoking: row.smoking || payload.smoking || "",
+      religion: row.religion || payload.religion || "",
+      preferred_age: row.preferred_age || payload.preferred_age || "",
+      avoided_age: row.avoided_age || payload.avoided_age || "",
+      avoided_person: row.avoided_person || payload.avoided_person || "",
+      ideal_type: row.ideal_type || payload.ideal_type || "",
+      self_intro: row.self_intro || payload.self_intro || "",
+      drink: row.drink || payload.drink || "",
+      drink_temperature: row.drink_temperature || payload.drink_temperature || "",
+      student_file:
+        row.employment_files ||
+        uploadedFiles.employment_file_names ||
+        [],
+      profile_photos:
+        row.profile_photos ||
+        uploadedFiles.profile_photo_names ||
+        [],
+      status: row.status || "new",
+      payment_status: row.payment_status || "unpaid",
+      matching_status: row.matching_status || "unmatched",
+    };
+  }
+
+  function renderDateOptions() {
+    const currentValue = elements.dateFilter.value;
+    const dates = Array.from(
+      new Set(state.rows.map((row) => row.preferred_date).filter(Boolean))
+    );
+
+    elements.dateFilter.innerHTML = '<option value="">전체 일정</option>';
+    dates.forEach((date) => {
+      const option = document.createElement("option");
+      option.value = date;
+      option.textContent = date;
+      elements.dateFilter.appendChild(option);
+    });
+
+    elements.dateFilter.value = dates.includes(currentValue) ? currentValue : "";
+  }
+
+  function applyFilters() {
+    const keyword = elements.searchInput.value.trim().toLowerCase();
+    const date = elements.dateFilter.value;
+    const gender = elements.genderFilter.value;
+    const status = elements.statusFilter.value;
+    const paymentStatus = elements.paymentFilter.value;
+    const matchingStatus = elements.matchingFilter.value;
+
+    state.filteredRows = state.rows.filter((row) => {
+      const haystack = [
+        row.name,
+        row.phone,
+        row.kakao_id,
+        row.school,
+        row.major,
+        row.residence,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      return (
+        (!keyword || haystack.includes(keyword)) &&
+        (!date || row.preferred_date === date) &&
+        (!gender || row.gender === gender) &&
+        (!status || row.status === status) &&
+        (!paymentStatus || (row.payment_status || "unpaid") === paymentStatus) &&
+        (!matchingStatus ||
+          (row.matching_status || "unmatched") === matchingStatus)
+      );
+    });
+
+    sortRows();
+    renderCounters();
+    renderTable();
+  }
+
+  function sortRows() {
+    const direction = state.sortDirection === "asc" ? 1 : -1;
+    const key = state.sortKey;
+
+    state.filteredRows.sort((a, b) => {
+      const aValue = a[key] ?? "";
+      const bValue = b[key] ?? "";
+
+      if (key === "age" || key === "score") {
+        return (Number(aValue) - Number(bValue)) * direction;
+      }
+
+      if (key === "submitted_at") {
+        return (new Date(aValue) - new Date(bValue)) * direction;
+      }
+
+      return String(aValue).localeCompare(String(bValue), "ko") * direction;
+    });
+  }
+
+  function renderCounters() {
+    elements.totalCount.textContent = String(state.filteredRows.length);
+    elements.maleCount.textContent = String(
+      state.filteredRows.filter((row) => row.gender === "남성").length
+    );
+    elements.femaleCount.textContent = String(
+      state.filteredRows.filter((row) => row.gender === "여성").length
+    );
+    elements.paidCount.textContent = String(
+      state.filteredRows.filter((row) =>
+        ["deposit_paid", "paid", "waived"].includes(row.payment_status || "unpaid")
+      ).length
+    );
+    elements.unpaidCount.textContent = String(
+      state.filteredRows.filter((row) => (row.payment_status || "unpaid") === "unpaid")
+        .length
+    );
+    elements.candidateCount.textContent = String(
+      state.filteredRows.filter(
+        (row) => (row.matching_status || "unmatched") === "candidate"
+      ).length
+    );
+    elements.matchedCount.textContent = String(
+      state.filteredRows.filter(
+        (row) => (row.matching_status || "unmatched") === "matched"
+      ).length
+    );
+    elements.reviewNeededCount.textContent = String(
+      state.filteredRows.filter((row) => (row.status || "new") === "new").length
+    );
+    elements.tableCaption.textContent = `${state.filteredRows.length}명을 표시 중입니다. 헤더를 클릭하면 정렬됩니다.`;
+  }
+
+  function renderTable() {
+    elements.tableBody.innerHTML = "";
+
+    state.filteredRows.forEach((row) => {
+      const tr = document.createElement("tr");
+      tr.classList.toggle("is-selected", state.selectedRow?.id === row.id);
+      tr.innerHTML = `
+        <td>${escapeHtml(formatDateTime(row.submitted_at))}</td>
+        <td><span class="status-pill" data-status="${escapeHtml(
+          row.status
+        )}">${escapeHtml(getStatusLabel(row.status))}</span></td>
+        <td><span class="status-pill" data-status="${escapeHtml(
+          row.payment_status || "unpaid"
+        )}">${escapeHtml(getPaymentLabel(row.payment_status))}</span></td>
+        <td><span class="status-pill" data-status="${escapeHtml(
+          row.matching_status || "unmatched"
+        )}">${escapeHtml(getMatchingLabel(row.matching_status))}</span></td>
+        <td>${escapeHtml(row.name)}</td>
+        <td>${escapeHtml(row.gender)}</td>
+        <td>${escapeHtml(row.age)}</td>
+        <td>${escapeHtml(row.school)}</td>
+        <td>${escapeHtml(row.preferred_date)}</td>
+        <td class="memo-cell">${escapeHtml(row.admin_note || "")}</td>
+        <td><button class="ghost-button" type="button" data-select-match="${
+          escapeHtml(row.id)
+        }">선택</button></td>
+      `;
+
+      tr.addEventListener("click", () => selectRow(row));
+      tr
+        .querySelector("[data-select-match]")
+        .addEventListener("click", (event) => {
+          event.stopPropagation();
+          selectMatchCandidate(row);
+        });
+
+      elements.tableBody.appendChild(tr);
+    });
+  }
+
+  function selectRow(row) {
+    state.selectedRow = row;
+    elements.emptyDetail.hidden = true;
+    elements.detailContent.hidden = false;
+    elements.reviewStatus.value = row.status || "new";
+    elements.paymentStatus.value = row.payment_status || "unpaid";
+    elements.matchingStatus.value = row.matching_status || "unmatched";
+    elements.reviewScore.value = row.score ?? "";
+    elements.reviewGroup.value = row.match_group || "";
+    elements.reviewNote.value = row.admin_note || "";
+    renderDetail(row);
+    renderTable();
+  }
+
+  function renderDetail(row) {
+    const fields = [
+      ["접수", formatDateTime(row.submitted_at)],
+      ["검토상태", getStatusLabel(row.status)],
+      ["입금상태", getPaymentLabel(row.payment_status)],
+      ["매칭상태", getMatchingLabel(row.matching_status)],
+      ["이름", row.name],
+      ["연락처", row.phone],
+      ["번호확인", row.phone_mismatch ? "재확인 번호 다름" : "일치"],
+      ["카카오", row.kakao_id],
+      ["성별", row.gender],
+      ["나이", row.age],
+      ["학교", `${row.school || ""} ${row.major || ""}`.trim()],
+      ["거주지", row.residence],
+      ["상태", row.job],
+      ["키/몸무게", [row.height_cm, row.weight_kg].filter(Boolean).join(" / ")],
+      ["흡연", row.smoking],
+      ["종교", row.religion],
+      ["일정", row.preferred_date],
+      ["프로그램", row.program_type],
+      ["신청유형", row.participation_type],
+      ["동반", row.companion_name],
+      ["선호연령", row.preferred_age],
+      ["회피연령", row.avoided_age],
+      ["회피지인", row.avoided_person],
+      ["이상형", row.ideal_type],
+      ["자기소개", row.self_intro],
+      ["음료", `${row.drink || ""} ${row.drink_temperature || ""}`.trim()],
+    ];
+
+    const dl = document.createElement("dl");
+    dl.className = "detail-list";
+
+    fields.forEach(([label, value]) => {
+      const wrapper = document.createElement("div");
+      const dt = document.createElement("dt");
+      const dd = document.createElement("dd");
+      wrapper.className = "detail-row";
+      dt.textContent = label;
+      dd.textContent = value || "-";
+      wrapper.append(dt, dd);
+      dl.appendChild(wrapper);
+    });
+
+    const fileRow = document.createElement("div");
+    const fileLabel = document.createElement("dt");
+    const fileValue = document.createElement("dd");
+    fileRow.className = "detail-row";
+    fileLabel.textContent = "첨부";
+    renderFiles(fileValue, row);
+    fileRow.append(fileLabel, fileValue);
+    dl.appendChild(fileRow);
+
+    elements.detailContent.innerHTML = "";
+    elements.detailContent.appendChild(dl);
+  }
+
+  function renderFiles(target, row) {
+    const files = [
+      ...(Array.isArray(row.student_file) ? row.student_file : []),
+      ...(Array.isArray(row.profile_photos) ? row.profile_photos : []),
+    ];
+
+    if (files.length === 0) {
+      target.textContent = "-";
+      return;
+    }
+
+    files.forEach((file) => {
+      const button = document.createElement("button");
+      button.className = "file-button";
+      button.type = "button";
+      button.textContent = file.name || file.path;
+      button.addEventListener("click", () => openSignedFile(file));
+      target.appendChild(button);
+    });
+  }
+
+  async function openSignedFile(file) {
+    const { data, error } = await client.storage
+      .from(file.bucket || "application-files")
+      .createSignedUrl(file.path, 60 * 5);
+
+    if (error) {
+      setMessage(elements.reviewMessage, error.message, true);
+      return;
+    }
+
+    window.open(data.signedUrl, "_blank", "noreferrer");
+  }
+
+  function selectMatchCandidate(row) {
+    if (row.gender === "남성") {
+      state.selectedMale = row;
+    } else if (row.gender === "여성") {
+      state.selectedFemale = row;
+    } else {
+      setMessage(elements.matchMessage, "성별이 남성/여성인 신청자만 선택할 수 있습니다.", true);
+      return;
+    }
+
+    elements.selectedMale.textContent = state.selectedMale?.name || "미선택";
+    elements.selectedFemale.textContent = state.selectedFemale?.name || "미선택";
+    elements.matchDate.value =
+      row.preferred_date || elements.matchDate.value || "";
+    elements.matchProgram.value =
+      row.program_type || elements.matchProgram.value || "";
+    elements.matchGroup.value =
+      row.match_group || elements.matchGroup.value || "";
+    setMessage(elements.matchMessage, "매칭 후보를 선택했습니다.");
+  }
+
+  async function saveReview(event) {
+    event.preventDefault();
+
+    if (!state.selectedRow) {
+      setMessage(elements.reviewMessage, "먼저 신청자를 선택해주세요.", true);
+      return;
+    }
+
+    const updates = {
+      status: elements.reviewStatus.value,
+      payment_status: elements.paymentStatus.value,
+      matching_status: elements.matchingStatus.value,
+      score: elements.reviewScore.value ? Number(elements.reviewScore.value) : null,
+      match_group: elements.reviewGroup.value.trim() || null,
+      admin_note: elements.reviewNote.value.trim() || null,
+      reviewed_at: new Date().toISOString(),
+    };
+
+    const { error } = await client
+      .from("application_submissions")
+      .update(updates)
+      .eq("id", state.selectedRow.id);
+
+    if (error) {
+      setMessage(elements.reviewMessage, error.message, true);
+      return;
+    }
+
+    setMessage(elements.reviewMessage, "저장했습니다.");
+    await loadData();
+    const updated = state.rows.find((row) => row.id === state.selectedRow.id);
+    if (updated) {
+      selectRow(updated);
+    }
+  }
+
+  async function saveMatch(event) {
+    event.preventDefault();
+
+    if (!state.selectedMale || !state.selectedFemale) {
+      setMessage(elements.matchMessage, "남성 1명과 여성 1명을 선택해주세요.", true);
+      return;
+    }
+
+    const matchGroup =
+      elements.matchGroup.value.trim() ||
+      `${elements.matchDate.value || "match"}-${Date.now()}`;
+
+    const [maleUpdate, femaleUpdate] = await Promise.all([
+      client
+        .from("application_submissions")
+        .update({
+          status: "matched",
+          matching_status: "matched",
+          match_group: matchGroup,
+          matched_with: state.selectedFemale.id,
+          admin_note: mergeMatchNote(
+            state.selectedMale.admin_note,
+            elements.matchNote.value
+          ),
+          reviewed_at: new Date().toISOString(),
+        })
+        .eq("id", state.selectedMale.id),
+      client
+        .from("application_submissions")
+        .update({
+          status: "matched",
+          matching_status: "matched",
+          match_group: matchGroup,
+          matched_with: state.selectedMale.id,
+          admin_note: mergeMatchNote(
+            state.selectedFemale.admin_note,
+            elements.matchNote.value
+          ),
+          reviewed_at: new Date().toISOString(),
+        })
+        .eq("id", state.selectedFemale.id),
+    ]);
+
+    if (maleUpdate.error || femaleUpdate.error) {
+      setMessage(
+        elements.matchMessage,
+        maleUpdate.error?.message || femaleUpdate.error?.message,
+        true
+      );
+      return;
+    }
+
+    setMessage(elements.matchMessage, "매칭을 저장했습니다.");
+    await loadData();
+  }
+
+  function mergeMatchNote(currentNote, matchNote) {
+    const trimmedMatchNote = matchNote.trim();
+    if (!trimmedMatchNote) {
+      return currentNote || null;
+    }
+
+    return [currentNote, `매칭메모: ${trimmedMatchNote}`]
+      .filter(Boolean)
+      .join("\n");
+  }
+
+  function renderSummary() {
+    const responseRows = buildResponseSummary();
+    const drinkRows = buildDrinkSummary();
+
+    elements.responseSummary.innerHTML = renderMiniTable(responseRows, [
+      ["일정", "preferred_date"],
+      ["프로그램", "program_type"],
+      ["상태", "status"],
+      ["입금", "payment_status"],
+      ["매칭", "matching_status"],
+      ["전체", "total_count"],
+      ["남", "male_count"],
+      ["여", "female_count"],
+    ]);
+
+    elements.drinkSummary.innerHTML = renderMiniTable(drinkRows, [
+      ["일정", "preferred_date"],
+      ["음료", "drink"],
+      ["온도", "drink_temperature"],
+      ["수량", "total_count"],
+    ]);
+  }
+
+  function buildResponseSummary() {
+    const groups = new Map();
+
+    state.rows.forEach((row) => {
+      const key = [
+        row.preferred_date || "",
+        row.program_type || "",
+        row.status || "new",
+        row.payment_status || "unpaid",
+        row.matching_status || "unmatched",
+      ].join("|");
+
+      if (!groups.has(key)) {
+        groups.set(key, {
+          preferred_date: row.preferred_date || "",
+          program_type: row.program_type || "",
+          status: row.status || "new",
+          payment_status: row.payment_status || "unpaid",
+          matching_status: row.matching_status || "unmatched",
+          total_count: 0,
+          male_count: 0,
+          female_count: 0,
+        });
+      }
+
+      const group = groups.get(key);
+      group.total_count += 1;
+      if (row.gender === "남성") {
+        group.male_count += 1;
+      }
+      if (row.gender === "여성") {
+        group.female_count += 1;
+      }
+    });
+
+    return Array.from(groups.values());
+  }
+
+  function buildDrinkSummary() {
+    const groups = new Map();
+
+    state.rows.forEach((row) => {
+      const key = [
+        row.preferred_date || "",
+        row.drink || "",
+        row.drink_temperature || "",
+      ].join("|");
+
+      if (!groups.has(key)) {
+        groups.set(key, {
+          preferred_date: row.preferred_date || "",
+          drink: row.drink || "",
+          drink_temperature: row.drink_temperature || "",
+          total_count: 0,
+        });
+      }
+
+      groups.get(key).total_count += 1;
+    });
+
+    return Array.from(groups.values());
+  }
+
+  function renderMiniTable(rows, columns) {
+    if (rows.length === 0) {
+      return '<p class="empty-state">표시할 데이터가 없습니다.</p>';
+    }
+
+    return `
+      <table>
+        <thead>
+          <tr>${columns.map(([label]) => `<th>${escapeHtml(label)}</th>`).join("")}</tr>
+        </thead>
+        <tbody>
+          ${rows
+            .map(
+              (row) => `
+                <tr>
+                  ${columns
+                    .map(([, key]) => `<td>${escapeHtml(row[key])}</td>`)
+                    .join("")}
+                </tr>
+              `
+            )
+            .join("")}
+        </tbody>
+      </table>
+    `;
+  }
+
+  elements.loginForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    setMessage(elements.loginMessage, "로그인 중입니다.");
+
+    const { error } = await client.auth.signInWithPassword({
+      email: elements.loginEmail.value.trim(),
+      password: elements.loginPassword.value,
+    });
+
+    if (error) {
+      setMessage(elements.loginMessage, error.message, true);
+      return;
+    }
+
+    if (await requireAdmin()) {
+      await loadData();
+    }
+  });
+
+  elements.logoutButton.addEventListener("click", async () => {
+    await client.auth.signOut();
+    showLogin();
+  });
+
+  [
+    elements.searchInput,
+    elements.dateFilter,
+    elements.genderFilter,
+    elements.statusFilter,
+    elements.paymentFilter,
+    elements.matchingFilter,
+  ].forEach((element) => {
+    element.addEventListener("input", applyFilters);
+    element.addEventListener("change", applyFilters);
+  });
+
+  elements.refreshButton.addEventListener("click", loadData);
+  elements.reviewForm.addEventListener("submit", saveReview);
+  elements.matchForm.addEventListener("submit", saveMatch);
+  document.querySelectorAll("[data-sort-key]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const sortKey = button.dataset.sortKey;
+      if (state.sortKey === sortKey) {
+        state.sortDirection = state.sortDirection === "asc" ? "desc" : "asc";
+      } else {
+        state.sortKey = sortKey;
+        state.sortDirection = sortKey === "submitted_at" ? "desc" : "asc";
+      }
+      applyFilters();
+    });
+  });
+
+  requireAdmin().then((isAdmin) => {
+    if (isAdmin) {
+      loadData();
+    }
+  });
+})();

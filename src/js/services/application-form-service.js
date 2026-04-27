@@ -25,6 +25,9 @@ window.CheongchunCampus.services.submitApplication =
       .from(supabaseConfig.applicationSubmissionsTable)
       .insert({
         payload: payloadWithFiles,
+        name: payload.name,
+        phone: payload.phone,
+        phone_confirm: payload.phone_confirm,
         applicant_name: payload.name,
         applicant_phone: payload.phone,
         kakao_id: payload.kakao_id,
@@ -32,9 +35,32 @@ window.CheongchunCampus.services.submitApplication =
         birth_year: payload.birth_year ? Number(payload.birth_year) : null,
         region: payload.region,
         school: payload.school,
+        major: payload.major,
+        residence: payload.residence,
+        job: payload.job,
+        height: toNullableNumber(payload.height),
+        weight: toNullableNumber(payload.weight),
+        smoking: payload.smoking,
+        religion: payload.religion,
         program_type: payload.program_type,
         participation_type: payload.participation_type,
         preferred_date: payload.preferred_date,
+        companion_name: payload.companion_name,
+        preferred_age: payload.preferred_age,
+        avoided_age: payload.avoided_age,
+        avoided_person: payload.avoided_person,
+        ideal_type: payload.ideal_type,
+        self_intro: payload.self_intro,
+        drink: payload.drink,
+        drink_temperature: payload.drink_temperature,
+        privacy_confirmed: Boolean(payload.privacy_confirmed),
+        student_status_confirmed: Boolean(payload.student_status_confirmed),
+        after_meeting_confirmed: Boolean(payload.after_meeting_confirmed),
+        refund_confirmed: Boolean(payload.refund_confirmed),
+        kakao_required_confirmed: Boolean(payload.kakao_required_confirmed),
+        employment_files:
+          payloadWithFiles.uploaded_files?.employment_file_names || [],
+        profile_photos: payloadWithFiles.uploaded_files?.profile_photo_names || [],
       });
 
     if (error) {
@@ -43,6 +69,15 @@ window.CheongchunCampus.services.submitApplication =
 
     return { stored: true };
   };
+
+function toNullableNumber(value) {
+  if (value === undefined || value === null || value === "") {
+    return null;
+  }
+
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : null;
+}
 
 function sanitizeFileName(fileName) {
   return fileName
