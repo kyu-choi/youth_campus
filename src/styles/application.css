@@ -212,6 +212,12 @@
   margin: 14px 0 0;
   color: var(--muted);
   line-height: 1.7;
+  white-space: pre-line;
+}
+
+.application-complete a {
+  color: var(--teal-deep);
+  font-weight: 700;
 }
 
 @media (min-width: 700px) {

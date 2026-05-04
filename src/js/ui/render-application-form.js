@@ -252,10 +252,24 @@ window.CheongchunCampus.ui.renderApplicationForm =
       const success = document.createElement("section");
       const title = document.createElement("h2");
       const message = document.createElement("p");
+      const kakaoUrl = "http://pf.kakao.com/_BxcVTX";
 
       success.className = "application-complete";
       title.textContent = config.successTitle;
-      message.textContent = config.successMessage;
+
+      config.successMessage.split(kakaoUrl).forEach((text, index) => {
+        if (index > 0) {
+          const link = document.createElement("a");
+
+          link.href = kakaoUrl;
+          link.target = "_blank";
+          link.rel = "noreferrer";
+          link.textContent = kakaoUrl;
+          message.appendChild(link);
+        }
+
+        message.appendChild(document.createTextNode(text));
+      });
 
       success.append(title, message);
       mount.append(homeButton, success);
@@ -340,7 +354,9 @@ window.CheongchunCampus.ui.renderApplicationForm =
       eyebrow.textContent = `${page.eyebrow} · ${currentPage + 1}/${activePages.length}`;
       title.textContent = currentPage === 0 ? config.title : page.title;
       description.textContent =
-        currentPage === 0 ? `${page.title}\n\n${config.privacyText}` : config.description;
+        currentPage === 0
+          ? `${page.title}\n\n${config.privacyText}`
+          : page.description || config.description;
       back.type = "button";
       back.textContent = "이전";
       back.disabled = currentPage === 0;

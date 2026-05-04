@@ -10,7 +10,7 @@ window.CheongchunCampus.config.applicationForm = {
   submitLabel: "신청완료",
   successTitle: "신청서 작성이 완료되었습니다",
   successMessage:
-    "신청 후 청춘 캠퍼스 공식 카카오톡 채널로 메시지 부탁드립니다. 신청 내용 확인 후 2~3일 내로 확인 연락드리겠습니다.",
+    "최종 접수를 위해 청춘 캠퍼스 공식 카카오톡 채널로 아래 정보를 보내주세요.\n\n지역 / 이름 / 학교 / 신청유형\n예: 대구 / 홍길동 / 경북대 / 신규 신청완료\n\n카톡 채널: http://pf.kakao.com/_BxcVTX\n\n확인 후 빠른 시일 내로 연락드리겠습니다.",
   pages: [
     {
       eyebrow: "프로그램 선택",
@@ -250,7 +250,7 @@ window.CheongchunCampus.config.applicationForm = {
         },
         {
           name: "profile_photo_names",
-          label: "얼굴 위주 사진 1장 / 상체까지 보이는 사진 1장",
+          label: "얼굴 위주 사진 1장",
           type: "file",
           required: true,
           multiple: true,
@@ -285,7 +285,7 @@ window.CheongchunCampus.config.applicationForm = {
         {
           name: "kakao_required_confirmed",
           label:
-            "신청서 제출 후, 청춘 캠퍼스 공식 카카오톡 채널로 지역 / 이름 / 학교 / 신청 유형을 보내야 최종 접수가 완료됨을 확인했습니다.",
+            "카카오톡 채널로 지역 / 이름 / 학교 / 신청유형을 보내야 최종 접수가 완료됨을 확인했습니다.",
           type: "checkbox",
           required: true,
         },
