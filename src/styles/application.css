@@ -72,6 +72,14 @@
   line-height: 1.45;
 }
 
+.application-field-notice {
+  display: block;
+  color: var(--coral);
+  font-size: 1.08rem;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
 .application-field input:not([type="radio"]):not([type="checkbox"]),
 .application-field textarea {
   width: 100%;

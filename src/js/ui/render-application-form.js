@@ -11,6 +11,60 @@ window.CheongchunCampus.ui.renderApplicationForm =
     const values = {};
     const files = {};
 
+    function matchesCondition(condition) {
+      if (!condition) {
+        return true;
+      }
+
+      return Object.entries(condition).every(([fieldName, expectedValue]) => {
+        const currentValue = values[fieldName];
+        return Array.isArray(expectedValue)
+          ? expectedValue.includes(currentValue)
+          : currentValue === expectedValue;
+      });
+    }
+
+    function getActivePages() {
+      return config.pages.filter((page) => matchesCondition(page.showWhen));
+    }
+
+    function getAllFieldNames() {
+      return config.pages.flatMap((page) =>
+        page.fields.map((field) => field.name)
+      );
+    }
+
+    function getActiveFieldNames() {
+      return new Set(
+        getActivePages().flatMap((page) =>
+          page.fields
+            .filter((field) => matchesCondition(field.showWhen))
+            .map((field) => field.name)
+        )
+      );
+    }
+
+    function pruneInactiveValues() {
+      const activeFieldNames = getActiveFieldNames();
+
+      getAllFieldNames().forEach((fieldName) => {
+        if (!activeFieldNames.has(fieldName)) {
+          delete values[fieldName];
+          delete files[fieldName];
+        }
+      });
+    }
+
+    function getCurrentPage() {
+      const activePages = getActivePages();
+
+      if (currentPage >= activePages.length) {
+        currentPage = Math.max(activePages.length - 1, 0);
+      }
+
+      return activePages[currentPage];
+    }
+
     function getFieldValue(field) {
       if (field.type === "checkbox") {
         return Boolean(values[field.name]);
@@ -32,7 +86,12 @@ window.CheongchunCampus.ui.renderApplicationForm =
         .querySelectorAll(".application-field.is-invalid")
         .forEach((node) => node.classList.remove("is-invalid"));
 
-      const missingField = config.pages[currentPage].fields.find((field) => {
+      const page = getCurrentPage();
+      const missingField = page.fields.find((field) => {
+        if (!matchesCondition(field.showWhen)) {
+          return false;
+        }
+
         if (!field.required) {
           return false;
         }
@@ -51,7 +110,11 @@ window.CheongchunCampus.ui.renderApplicationForm =
     }
 
     function collectVisibleInputs() {
-      config.pages[currentPage].fields.forEach((field) => {
+      getCurrentPage().fields.forEach((field) => {
+        if (!matchesCondition(field.showWhen)) {
+          return;
+        }
+
         const fieldNode = mount.querySelector(`[data-field="${field.name}"]`);
 
         if (!fieldNode) {
@@ -98,6 +161,14 @@ window.CheongchunCampus.ui.renderApplicationForm =
       wrapper.dataset.field = field.name;
       label.className = "application-label";
       label.textContent = `${field.label}${required}`;
+
+      if (field.notice) {
+        const notice = document.createElement("strong");
+
+        notice.className = "application-field-notice";
+        notice.textContent = field.notice;
+        wrapper.appendChild(notice);
+      }
 
       if (field.type === "choice") {
         const choices = document.createElement("div");
@@ -216,6 +287,8 @@ window.CheongchunCampus.ui.renderApplicationForm =
         return;
       }
 
+      pruneInactiveValues();
+
       const submitButton = mount.querySelector(".application-next");
       submitButton.disabled = true;
       submitButton.textContent = "제출 중";
@@ -232,7 +305,8 @@ window.CheongchunCampus.ui.renderApplicationForm =
     }
 
     function render() {
-      const page = config.pages[currentPage];
+      const page = getCurrentPage();
+      const activePages = getActivePages();
       const section = document.createElement("section");
       const header = document.createElement("div");
       const eyebrow = document.createElement("p");
@@ -246,7 +320,7 @@ window.CheongchunCampus.ui.renderApplicationForm =
       const next = document.createElement("button");
       const error = document.createElement("p");
       const homeButton = createHomeButton();
-      const isLastPage = currentPage === config.pages.length - 1;
+      const isLastPage = currentPage === activePages.length - 1;
 
       mount.innerHTML = "";
       section.className = "application-card";
@@ -255,7 +329,7 @@ window.CheongchunCampus.ui.renderApplicationForm =
       title.className = "application-title";
       description.className = "application-description";
       progress.className = "application-progress";
-      progressBar.style.width = `${((currentPage + 1) / config.pages.length) * 100}%`;
+      progressBar.style.width = `${((currentPage + 1) / activePages.length) * 100}%`;
       fields.className = "application-fields";
       actions.className = "application-actions";
       back.className = "application-back";
@@ -263,7 +337,7 @@ window.CheongchunCampus.ui.renderApplicationForm =
       error.className = "application-error";
       error.hidden = true;
 
-      eyebrow.textContent = `${page.eyebrow} · ${currentPage + 1}/${config.pages.length}`;
+      eyebrow.textContent = `${page.eyebrow} · ${currentPage + 1}/${activePages.length}`;
       title.textContent = currentPage === 0 ? config.title : page.title;
       description.textContent =
         currentPage === 0 ? `${page.title}\n\n${config.privacyText}` : config.description;
@@ -274,7 +348,9 @@ window.CheongchunCampus.ui.renderApplicationForm =
       next.textContent = isLastPage ? config.submitLabel : "다음";
       error.textContent = "제출 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.";
 
-      page.fields.forEach((field) => fields.appendChild(createField(field)));
+      page.fields
+        .filter((field) => matchesCondition(field.showWhen))
+        .forEach((field) => fields.appendChild(createField(field)));
 
       back.addEventListener("click", () => {
         collectVisibleInputs();
@@ -288,6 +364,8 @@ window.CheongchunCampus.ui.renderApplicationForm =
         if (!validatePage()) {
           return;
         }
+
+        pruneInactiveValues();
 
         if (isLastPage) {
           submit();

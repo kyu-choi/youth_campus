@@ -321,6 +321,28 @@ textarea {
   font-weight: 700;
 }
 
+.program-pill {
+  display: inline-flex;
+  min-width: 112px;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: #e0f2fe;
+  color: #075985;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.program-pill[data-program="다대다 로테이션 소개팅"] {
+  background: #dff4ea;
+  color: #13704d;
+}
+
+.program-pill[data-program="1:1 카톡 소개팅"] {
+  background: #e0eaff;
+  color: var(--admin-blue);
+}
+
 .status-pill[data-status="matched"],
 .status-pill[data-status="paid"],
 .status-pill[data-status="deposit_paid"],

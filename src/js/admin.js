@@ -33,6 +33,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     tableCaption: document.getElementById("table-caption"),
     searchInput: document.getElementById("search-input"),
     dateFilter: document.getElementById("date-filter"),
+    programFilter: document.getElementById("program-filter"),
     genderFilter: document.getElementById("gender-filter"),
     statusFilter: document.getElementById("status-filter"),
     paymentFilter: document.getElementById("payment-filter"),
@@ -115,6 +116,17 @@ window.CheongchunCampus = window.CheongchunCampus || {};
         notified: "안내완료",
         cancelled: "취소",
       }[status] || status || "미매칭"
+    );
+  }
+
+  function getProgramLabel(programType) {
+    return (
+      {
+        "다대다 로테이션 소개팅": "로테이션 소개팅",
+        "1:1 카톡 소개팅": "1:1 카톡 소개팅",
+      }[programType] ||
+      programType ||
+      "-"
     );
   }
 
@@ -258,6 +270,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
   function applyFilters() {
     const keyword = elements.searchInput.value.trim().toLowerCase();
     const date = elements.dateFilter.value;
+    const program = elements.programFilter.value;
     const gender = elements.genderFilter.value;
     const status = elements.statusFilter.value;
     const paymentStatus = elements.paymentFilter.value;
@@ -271,6 +284,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
         row.school,
         row.major,
         row.residence,
+        row.program_type,
       ]
         .filter(Boolean)
         .join(" ")
@@ -279,6 +293,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
       return (
         (!keyword || haystack.includes(keyword)) &&
         (!date || row.preferred_date === date) &&
+        (!program || row.program_type === program) &&
         (!gender || row.gender === gender) &&
         (!status || row.status === status) &&
         (!paymentStatus || (row.payment_status || "unpaid") === paymentStatus) &&
@@ -299,16 +314,24 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     state.filteredRows.sort((a, b) => {
       const aValue = a[key] ?? "";
       const bValue = b[key] ?? "";
+      const fallbackBySubmittedAt =
+        new Date(b.submitted_at || 0) - new Date(a.submitted_at || 0);
 
       if (key === "age" || key === "score") {
-        return (Number(aValue) - Number(bValue)) * direction;
+        return (
+          (Number(aValue) - Number(bValue)) * direction ||
+          fallbackBySubmittedAt
+        );
       }
 
       if (key === "submitted_at") {
         return (new Date(aValue) - new Date(bValue)) * direction;
       }
 
-      return String(aValue).localeCompare(String(bValue), "ko") * direction;
+      return (
+        String(aValue).localeCompare(String(bValue), "ko") * direction ||
+        fallbackBySubmittedAt
+      );
     });
   }
 
@@ -362,6 +385,9 @@ window.CheongchunCampus = window.CheongchunCampus || {};
         <td><span class="status-pill" data-status="${escapeHtml(
           row.matching_status || "unmatched"
         )}">${escapeHtml(getMatchingLabel(row.matching_status))}</span></td>
+        <td><span class="program-pill" data-program="${escapeHtml(
+          row.program_type
+        )}">${escapeHtml(getProgramLabel(row.program_type))}</span></td>
         <td>${escapeHtml(row.name)}</td>
         <td>${escapeHtml(row.gender)}</td>
         <td>${escapeHtml(row.age)}</td>
@@ -753,6 +779,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
   [
     elements.searchInput,
     elements.dateFilter,
+    elements.programFilter,
     elements.genderFilter,
     elements.statusFilter,
     elements.paymentFilter,

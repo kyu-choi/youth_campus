@@ -2,16 +2,30 @@ window.CheongchunCampus = window.CheongchunCampus || {};
 window.CheongchunCampus.config = window.CheongchunCampus.config || {};
 
 window.CheongchunCampus.config.applicationForm = {
-  title: "[청춘 캠퍼스 로테이션 소개팅 신청서]",
+  title: "[청춘 캠퍼스 소개팅 신청서]",
   description:
-    "청춘 캠퍼스 로테이션 소개팅 신청을 위한 기본 정보와 선호 내용을 작성해주세요.",
+    "청춘 캠퍼스 소개팅 신청을 위한 기본 정보와 선호 내용을 작성해주세요.",
   privacyText:
     "수집 항목: 이름, 연락처, 거주지, 직장, 사진 등 신청서에 기입된 사항. 목적: 소개팅 선정자 안내 및 신원 확인. 보유 기간: 신청일로부터 5년 후 폐기.",
   submitLabel: "신청완료",
   successTitle: "신청서 작성이 완료되었습니다",
   successMessage:
-    "신청 내용은 전달되었습니다. 확정 후 개별 안내 문자로 자세한 장소를 알려드릴 예정입니다.",
+    "신청 후 청춘 캠퍼스 공식 카카오톡 채널로 메시지 부탁드립니다. 신청 내용 확인 후 2~3일 내로 확인 연락드리겠습니다.",
   pages: [
+    {
+      eyebrow: "프로그램 선택",
+      title: "신청할 프로그램을 선택해주세요.",
+      fields: [
+        {
+          name: "program_type",
+          label: "신청 프로그램",
+          notice: "5월 9일 첫 소개팅 전까지 신청금액 5천원!!",
+          type: "choice",
+          required: true,
+          options: ["다대다 로테이션 소개팅", "1:1 카톡 소개팅"],
+        },
+      ],
+    },
     {
       eyebrow: "기본 정보",
       title: "신청자 기본 정보를 입력해주세요.",
@@ -29,13 +43,6 @@ window.CheongchunCampus.config.applicationForm = {
           type: "choice",
           required: true,
           options: ["대구"],
-        },
-        {
-          name: "program_type",
-          label: "신청 프로그램",
-          type: "choice",
-          required: true,
-          options: ["다대다 로테이션 소개팅", "1:1 카톡 소개팅"],
         },
         {
           name: "birth_year",
@@ -75,29 +82,37 @@ window.CheongchunCampus.config.applicationForm = {
     },
     {
       eyebrow: "신청 유형",
-      title: "희망 프로그램과 일정을 선택해주세요.",
+      title: "신청 유형과 연락처를 확인해주세요.",
       fields: [
-        {
-          name: "preferred_date",
-          label: "참여희망날짜",
-          type: "choice",
-          required: true,
-          options: [
-            {
-              value: "5월 2일 (토) 오후 3시",
-              label: "5월 2일 (토) 오후 3시",
-              badge: "(마감)",
-              badgeTone: "danger",
-            },
-            "5월 9일 (토) 오후 3시",
-          ],
-        },
         {
           name: "participation_type",
           label: "신청유형",
           type: "choice",
           required: true,
           options: ["신규 신청", "재신청"],
+        },
+        {
+          name: "phone_confirm",
+          label: "연락처(재확인)",
+          type: "tel",
+          placeholder: "010-1234-5678",
+          required: true,
+        },
+      ],
+    },
+    {
+      eyebrow: "로테이션 일정",
+      title: "로테이션 소개팅 참여 일정을 선택해주세요.",
+      showWhen: {
+        program_type: "다대다 로테이션 소개팅",
+      },
+      fields: [
+        {
+          name: "preferred_date",
+          label: "참여희망날짜",
+          type: "choice",
+          required: true,
+          options: ["5월 9일 (토) 오후 12시"],
         },
         {
           name: "companion_name",
@@ -203,6 +218,9 @@ window.CheongchunCampus.config.applicationForm = {
     {
       eyebrow: "당일 준비",
       title: "소개팅 당일 음료를 선택해주세요.",
+      showWhen: {
+        program_type: "다대다 로테이션 소개팅",
+      },
       fields: [
         {
           name: "drink",
@@ -217,13 +235,6 @@ window.CheongchunCampus.config.applicationForm = {
           type: "choice",
           required: true,
           options: ["핫", "아이스"],
-        },
-        {
-          name: "phone_confirm",
-          label: "연락처(재확인)",
-          type: "tel",
-          placeholder: "010-1234-5678",
-          required: true,
         },
       ],
     },
