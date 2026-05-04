@@ -21,6 +21,8 @@ body {
   margin: 0;
   background: var(--admin-bg);
   color: var(--admin-ink);
+  min-width: 320px;
+  overflow-x: hidden;
 }
 
 [hidden] {
@@ -129,6 +131,7 @@ textarea {
   border-radius: 6px;
   background: #fff;
   color: var(--admin-ink);
+  min-height: 42px;
   padding: 10px 12px;
 }
 
@@ -138,7 +141,7 @@ textarea {
 
 .primary-button,
 .ghost-button {
-  min-height: 40px;
+  min-height: 42px;
   border-radius: 6px;
   border: 1px solid transparent;
   padding: 0 14px;
@@ -247,6 +250,7 @@ textarea {
 
 .table-wrap {
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
   max-height: 720px;
   border: 1px solid var(--admin-line);
   border-radius: 6px;
@@ -443,8 +447,14 @@ textarea {
 
 .mini-table table {
   width: 100%;
+  min-width: 520px;
   border-collapse: collapse;
   font-size: 13px;
+}
+
+.mini-table {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .mini-table th,
@@ -472,19 +482,245 @@ textarea {
 @media (max-width: 760px) {
   .admin-shell {
     width: min(100% - 20px, 1480px);
+    padding: 14px 0 28px;
   }
 
   .admin-topbar {
     align-items: flex-start;
     flex-direction: column;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 14px;
   }
 
-  .summary-grid,
+  .admin-session {
+    width: 100%;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .admin-session .ghost-button {
+    width: 100%;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  h2 {
+    font-size: 17px;
+  }
+
+  .login-panel {
+    min-height: 60vh;
+  }
+
+  .login-card,
+  .table-panel,
+  .detail-card {
+    padding: 14px;
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .summary-card {
+    padding: 12px;
+  }
+
+  .summary-card strong {
+    font-size: 23px;
+  }
+
+  .tool-grid {
+    gap: 12px;
+  }
+
+  .panel-heading {
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .panel-heading .ghost-button {
+    width: 100%;
+  }
+
   .detail-panel {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .filter-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .filter-bar input {
+    grid-column: 1 / -1;
   }
 
   .filter-bar > * {
-    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .table-wrap {
+    max-height: none;
+    overflow: visible;
+    border: 0;
+    background: transparent;
+  }
+
+  .response-table,
+  .response-table tbody,
+  .response-table tr,
+  .response-table td {
+    width: 100%;
+  }
+
+  .response-table {
+    min-width: 0;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+    background: transparent;
+    font-size: 13px;
+  }
+
+  .response-table thead {
+    display: none;
+  }
+
+  .response-table tr {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--admin-line);
+    border-radius: var(--admin-radius);
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+    overflow: hidden;
+  }
+
+  .response-table tr:hover,
+  .response-table tr.is-selected {
+    background: #fff;
+  }
+
+  .response-table tr.is-selected {
+    border-color: #8bd8cf;
+    box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.14);
+  }
+
+  .response-table td {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+    border-bottom: 1px solid #edf1ee;
+    padding: 11px 12px;
+    color: #344054;
+    line-height: 1.5;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .response-table td:last-child {
+    border-bottom: 0;
+  }
+
+  .response-table td::before {
+    content: attr(data-label);
+    color: var(--admin-muted);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+
+  .response-table td[data-label="이름"] {
+    order: -10;
+    grid-template-columns: 1fr;
+    gap: 3px;
+    background: #f8fffd;
+    color: var(--admin-ink);
+    font-size: 17px;
+    font-weight: 800;
+  }
+
+  .response-table td[data-label="이름"]::before {
+    font-size: 11px;
+  }
+
+  .response-table td[data-label="검토"],
+  .response-table td[data-label="입금"],
+  .response-table td[data-label="매칭"] {
+    order: -8;
+  }
+
+  .response-table td[data-label="프로그램"],
+  .response-table td[data-label="일정"] {
+    order: -6;
+  }
+
+  .response-table td[data-label="접수"] {
+    color: var(--admin-muted);
+  }
+
+  .response-table td[data-label="매칭 선택"] {
+    align-items: center;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .response-table td[data-label="매칭 선택"] .ghost-button {
+    width: 100%;
+  }
+
+  .memo-cell {
+    max-width: none;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .status-pill,
+  .program-pill {
+    min-width: 0;
+    width: fit-content;
+    max-width: 100%;
+    padding: 5px 9px;
+    white-space: normal;
+  }
+
+  .detail-row {
+    grid-template-columns: 84px minmax(0, 1fr);
+    gap: 10px;
+    padding-bottom: 10px;
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .detail-row dt {
+    font-size: 12px;
+  }
+
+  .summary-tables {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 12px;
+  }
+}
+
+@media (max-width: 420px) {
+  .filter-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .response-table td,
+  .detail-row {
+    grid-template-columns: 76px minmax(0, 1fr);
   }
 }

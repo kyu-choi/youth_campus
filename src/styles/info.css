@@ -7,7 +7,7 @@
 }
 
 .home-button {
-  min-height: 34px;
+  min-height: 38px;
   margin-bottom: 12px;
   padding: 0 14px;
   border: 1px solid rgba(84, 174, 181, 0.25);
@@ -22,7 +22,7 @@
 }
 
 .info-card {
-  padding: 28px 18px;
+  padding: 22px 14px;
   border: 1px solid var(--border);
   border-radius: 24px;
   background: rgba(247, 251, 248, 0.9);
@@ -40,7 +40,7 @@
 
 .info-card h2 {
   margin-bottom: 14px;
-  font-size: clamp(1.9rem, 9vw, 3rem);
+  font-size: clamp(1.65rem, 8vw, 3rem);
   font-weight: 800;
   line-height: 1.12;
   color: var(--coral-deep);
@@ -69,8 +69,8 @@
 .info-card p,
 .info-card li {
   color: var(--muted);
-  font-size: 0.96rem;
-  line-height: 1.75;
+  font-size: 0.94rem;
+  line-height: 1.7;
 }
 
 .info-card ul {

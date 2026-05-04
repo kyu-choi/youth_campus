@@ -375,26 +375,26 @@ window.CheongchunCampus = window.CheongchunCampus || {};
       const tr = document.createElement("tr");
       tr.classList.toggle("is-selected", state.selectedRow?.id === row.id);
       tr.innerHTML = `
-        <td>${escapeHtml(formatDateTime(row.submitted_at))}</td>
-        <td><span class="status-pill" data-status="${escapeHtml(
+        <td data-label="접수">${escapeHtml(formatDateTime(row.submitted_at))}</td>
+        <td data-label="검토"><span class="status-pill" data-status="${escapeHtml(
           row.status
         )}">${escapeHtml(getStatusLabel(row.status))}</span></td>
-        <td><span class="status-pill" data-status="${escapeHtml(
+        <td data-label="입금"><span class="status-pill" data-status="${escapeHtml(
           row.payment_status || "unpaid"
         )}">${escapeHtml(getPaymentLabel(row.payment_status))}</span></td>
-        <td><span class="status-pill" data-status="${escapeHtml(
+        <td data-label="매칭"><span class="status-pill" data-status="${escapeHtml(
           row.matching_status || "unmatched"
         )}">${escapeHtml(getMatchingLabel(row.matching_status))}</span></td>
-        <td><span class="program-pill" data-program="${escapeHtml(
+        <td data-label="프로그램"><span class="program-pill" data-program="${escapeHtml(
           row.program_type
         )}">${escapeHtml(getProgramLabel(row.program_type))}</span></td>
-        <td>${escapeHtml(row.name)}</td>
-        <td>${escapeHtml(row.gender)}</td>
-        <td>${escapeHtml(row.age)}</td>
-        <td>${escapeHtml(row.school)}</td>
-        <td>${escapeHtml(row.preferred_date)}</td>
-        <td class="memo-cell">${escapeHtml(row.admin_note || "")}</td>
-        <td><button class="ghost-button" type="button" data-select-match="${
+        <td data-label="이름">${escapeHtml(row.name)}</td>
+        <td data-label="성별">${escapeHtml(row.gender)}</td>
+        <td data-label="나이">${escapeHtml(row.age)}</td>
+        <td data-label="학교">${escapeHtml(row.school)}</td>
+        <td data-label="일정">${escapeHtml(row.preferred_date)}</td>
+        <td data-label="메모" class="memo-cell">${escapeHtml(row.admin_note || "")}</td>
+        <td data-label="매칭 선택"><button class="ghost-button" type="button" data-select-match="${
           escapeHtml(row.id)
         }">선택</button></td>
       `;
