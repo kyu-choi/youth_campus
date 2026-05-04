@@ -97,6 +97,31 @@
               </button>
             </div>
 
+            <div class="mobile-flow" aria-label="모바일 신청자 보기 선택">
+              <div class="mobile-program-tabs">
+                <button
+                  class="ghost-button"
+                  type="button"
+                  data-mobile-program="1:1 카톡 소개팅"
+                >
+                  1대1 소개팅
+                </button>
+                <button
+                  class="ghost-button"
+                  type="button"
+                  data-mobile-program="다대다 로테이션 소개팅"
+                >
+                  로테이션 소개팅
+                </button>
+              </div>
+              <div
+                id="mobile-date-choices"
+                class="mobile-date-choices"
+                hidden
+              ></div>
+              <p id="mobile-flow-hint" class="mobile-flow-hint"></p>
+            </div>
+
             <div class="filter-bar">
               <input
                 id="search-input"
@@ -163,6 +188,11 @@
                 <tbody id="response-table-body"></tbody>
               </table>
             </div>
+            <div
+              id="mobile-response-list"
+              class="mobile-response-list"
+              aria-label="모바일 신청자 목록"
+            ></div>
           </div>
 
           <aside class="detail-panel">

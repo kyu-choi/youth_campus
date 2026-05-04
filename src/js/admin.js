@@ -11,6 +11,8 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     selectedFemale: null,
     sortKey: "submitted_at",
     sortDirection: "desc",
+    mobileProgramType: "",
+    mobileDate: "",
   };
 
   const elements = {
@@ -40,6 +42,10 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     matchingFilter: document.getElementById("matching-filter"),
     refreshButton: document.getElementById("refresh-button"),
     tableBody: document.getElementById("response-table-body"),
+    mobileProgramButtons: document.querySelectorAll("[data-mobile-program]"),
+    mobileDateChoices: document.getElementById("mobile-date-choices"),
+    mobileFlowHint: document.getElementById("mobile-flow-hint"),
+    mobileList: document.getElementById("mobile-response-list"),
     emptyDetail: document.getElementById("empty-detail"),
     detailContent: document.getElementById("detail-content"),
     reviewForm: document.getElementById("review-form"),
@@ -126,6 +132,27 @@ window.CheongchunCampus = window.CheongchunCampus || {};
         "1:1 카톡 소개팅": "1:1 카톡 소개팅",
       }[programType] ||
       programType ||
+      "-"
+    );
+  }
+
+  function getMobileProgramLabel(programType) {
+    return (
+      {
+        "다대다 로테이션 소개팅": "로테이션",
+        "1:1 카톡 소개팅": "1대1",
+      }[programType] ||
+      getProgramLabel(programType)
+    );
+  }
+
+  function getMobileGenderLabel(gender) {
+    return (
+      {
+        남성: "남",
+        여성: "여",
+      }[gender] ||
+      gender ||
       "-"
     );
   }
@@ -303,8 +330,19 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     });
 
     sortRows();
+    syncMobileSelection();
     renderCounters();
     renderTable();
+  }
+
+  function syncMobileSelection() {
+    if (
+      state.mobileProgramType === "다대다 로테이션 소개팅" &&
+      state.mobileDate &&
+      !getMobileRotationDates().includes(state.mobileDate)
+    ) {
+      state.mobileDate = "";
+    }
   }
 
   function sortRows() {
@@ -370,6 +408,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
 
   function renderTable() {
     elements.tableBody.innerHTML = "";
+    elements.mobileList.innerHTML = "";
 
     state.filteredRows.forEach((row) => {
       const tr = document.createElement("tr");
@@ -409,6 +448,219 @@ window.CheongchunCampus = window.CheongchunCampus || {};
 
       elements.tableBody.appendChild(tr);
     });
+
+    renderMobileFlow();
+    getMobileRows().forEach((row) => {
+      elements.mobileList.appendChild(createMobileCard(row));
+    });
+  }
+
+  function renderMobileFlow() {
+    elements.mobileProgramButtons.forEach((button) => {
+      const isSelected = button.dataset.mobileProgram === state.mobileProgramType;
+      button.classList.toggle("is-selected", isSelected);
+    });
+
+    elements.mobileDateChoices.innerHTML = "";
+
+    if (!state.mobileProgramType) {
+      elements.mobileDateChoices.hidden = true;
+      elements.mobileFlowHint.textContent = "프로그램을 선택해주세요.";
+      return;
+    }
+
+    if (state.mobileProgramType === "1:1 카톡 소개팅") {
+      const count = getMobileRows().length;
+      elements.mobileDateChoices.hidden = true;
+      elements.mobileFlowHint.textContent = `1대1 신청자 ${count}명을 표시 중입니다.`;
+      return;
+    }
+
+    const dates = getMobileRotationDates();
+    elements.mobileDateChoices.hidden = false;
+
+    dates.forEach((date) => {
+      const button = document.createElement("button");
+      button.className = "ghost-button";
+      button.type = "button";
+      button.textContent = date;
+      button.classList.toggle("is-selected", state.mobileDate === date);
+      button.addEventListener("click", () => {
+        state.mobileDate = state.mobileDate === date ? "" : date;
+        renderTable();
+      });
+      elements.mobileDateChoices.appendChild(button);
+    });
+
+    if (dates.length === 0) {
+      elements.mobileFlowHint.textContent = "표시할 로테이션 일정이 없습니다.";
+      return;
+    }
+
+    if (!state.mobileDate) {
+      elements.mobileFlowHint.textContent = "확인할 날짜를 선택해주세요.";
+      return;
+    }
+
+    elements.mobileFlowHint.textContent = `${state.mobileDate} 신청자 ${
+      getMobileRows().length
+    }명을 표시 중입니다.`;
+  }
+
+  function getMobileRotationDates() {
+    return Array.from(
+      new Set(
+        state.filteredRows
+          .filter((row) => row.program_type === "다대다 로테이션 소개팅")
+          .map((row) => row.preferred_date)
+          .filter(Boolean)
+      )
+    );
+  }
+
+  function getMobileRows() {
+    if (!state.mobileProgramType) {
+      return [];
+    }
+
+    if (state.mobileProgramType === "1:1 카톡 소개팅") {
+      return state.filteredRows.filter(
+        (row) => row.program_type === "1:1 카톡 소개팅"
+      );
+    }
+
+    if (!state.mobileDate) {
+      return [];
+    }
+
+    return state.filteredRows.filter(
+      (row) =>
+        row.program_type === "다대다 로테이션 소개팅" &&
+        row.preferred_date === state.mobileDate
+    );
+  }
+
+  function createMobileCard(row) {
+    const card = document.createElement("article");
+    const isSelected = state.selectedRow?.id === row.id;
+    card.className = "mobile-response-card";
+    card.classList.toggle("is-expanded", isSelected);
+
+    card.innerHTML = `
+      <button class="mobile-response-summary" type="button" aria-expanded="${
+        isSelected ? "true" : "false"
+      }">
+        <span class="mobile-line-name">${escapeHtml(row.name || "이름 없음")}</span>
+        <span class="mobile-line-gender" data-gender="${escapeHtml(row.gender)}">${escapeHtml(
+      getMobileGenderLabel(row.gender)
+    )}</span>
+        <span>${escapeHtml(row.age ? `${row.age}세` : "-")}</span>
+        <span class="mobile-line-status" data-status="${escapeHtml(
+          row.payment_status || "unpaid"
+        )}">${escapeHtml(getPaymentLabel(row.payment_status))}</span>
+        <span class="mobile-line-status" data-status="${escapeHtml(
+          row.matching_status || "unmatched"
+        )}">${escapeHtml(getMatchingLabel(row.matching_status))}</span>
+      </button>
+    `;
+
+    card
+      .querySelector(".mobile-response-summary")
+      .addEventListener("click", () => {
+        if (state.selectedRow?.id === row.id) {
+          clearSelectedRow();
+          return;
+        }
+
+        selectRow(row);
+      });
+
+    if (isSelected) {
+      const detail = document.createElement("div");
+      detail.className = "mobile-response-detail";
+      detail.appendChild(createMobileDetail(row));
+
+      const actions = document.createElement("div");
+      actions.className = "mobile-response-actions";
+      actions.innerHTML = `
+        <button class="ghost-button" type="button" data-mobile-match>매칭 선택</button>
+        <button class="primary-button" type="button" data-mobile-edit>상태 수정</button>
+      `;
+      actions
+        .querySelector("[data-mobile-match]")
+        .addEventListener("click", () => selectMatchCandidate(row));
+      actions.querySelector("[data-mobile-edit]").addEventListener("click", () => {
+        elements.reviewForm.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      detail.appendChild(actions);
+      card.appendChild(detail);
+    }
+
+    return card;
+  }
+
+  function createMobileDetail(row) {
+    const detail = document.createElement("div");
+    detail.className = "mobile-detail-grid";
+
+    const fields = [
+      ["연락처", row.phone],
+      ["카카오", row.kakao_id],
+      ["학교", `${row.school || ""} ${row.major || ""}`.trim()],
+      ["거주지", row.residence],
+      ["상태", row.job],
+      ["키/몸무게", [row.height_cm, row.weight_kg].filter(Boolean).join(" / ")],
+      ["흡연", row.smoking],
+      ["검토", getStatusLabel(row.status)],
+      ["입금", getPaymentLabel(row.payment_status)],
+      ["매칭", getMatchingLabel(row.matching_status)],
+      ["신청유형", row.participation_type],
+      ["동반", row.companion_name],
+      ["음료", `${row.drink || ""} ${row.drink_temperature || ""}`.trim()],
+      ["접수", formatDateTime(row.submitted_at)],
+    ];
+
+    fields.forEach(([label, value]) => {
+      const item = document.createElement("div");
+      item.className = "mobile-detail-item";
+      item.innerHTML = `
+        <span>${escapeHtml(label)}</span>
+        <strong>${escapeHtml(value || "-")}</strong>
+      `;
+      detail.appendChild(item);
+    });
+
+    [
+      ["선호연령", row.preferred_age],
+      ["회피연령", row.avoided_age],
+      ["회피지인", row.avoided_person],
+      ["이상형", row.ideal_type],
+      ["자기소개", row.self_intro],
+      ["관리메모", row.admin_note],
+    ].forEach(([label, value]) => {
+      if (!value) {
+        return;
+      }
+
+      const item = document.createElement("div");
+      item.className = "mobile-detail-item mobile-detail-wide";
+      item.innerHTML = `
+        <span>${escapeHtml(label)}</span>
+        <strong>${escapeHtml(value)}</strong>
+      `;
+      detail.appendChild(item);
+    });
+
+    const files = document.createElement("div");
+    files.className = "mobile-detail-item mobile-detail-wide";
+    files.innerHTML = "<span>첨부</span>";
+    const fileValue = document.createElement("strong");
+    renderFiles(fileValue, row);
+    files.appendChild(fileValue);
+    detail.appendChild(files);
+
+    return detail;
   }
 
   function selectRow(row) {
@@ -425,7 +677,20 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     renderTable();
   }
 
+  function clearSelectedRow() {
+    state.selectedRow = null;
+    elements.emptyDetail.hidden = false;
+    elements.detailContent.hidden = true;
+    elements.detailContent.innerHTML = "";
+    renderTable();
+  }
+
   function renderDetail(row) {
+    elements.detailContent.innerHTML = "";
+    elements.detailContent.appendChild(createDetailList(row));
+  }
+
+  function createDetailList(row) {
     const fields = [
       ["접수", formatDateTime(row.submitted_at)],
       ["검토상태", getStatusLabel(row.status)],
@@ -477,8 +742,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     fileRow.append(fileLabel, fileValue);
     dl.appendChild(fileRow);
 
-    elements.detailContent.innerHTML = "";
-    elements.detailContent.appendChild(dl);
+    return dl;
   }
 
   function renderFiles(target, row) {
@@ -792,6 +1056,17 @@ window.CheongchunCampus = window.CheongchunCampus || {};
   elements.refreshButton.addEventListener("click", loadData);
   elements.reviewForm.addEventListener("submit", saveReview);
   elements.matchForm.addEventListener("submit", saveMatch);
+  elements.mobileProgramButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const nextProgram = button.dataset.mobileProgram;
+      state.mobileProgramType =
+        state.mobileProgramType === nextProgram ? "" : nextProgram;
+      state.mobileDate = "";
+      elements.dateFilter.value = "";
+      elements.programFilter.value = "";
+      clearSelectedRow();
+    });
+  });
   document.querySelectorAll("[data-sort-key]").forEach((button) => {
     button.addEventListener("click", () => {
       const sortKey = button.dataset.sortKey;
