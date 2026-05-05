@@ -143,13 +143,20 @@
   display: flex;
   flex: 1 1 auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
+  justify-content: flex-start;
+  min-width: 0;
 }
 
 .choice-option-badge {
   flex: 0 0 auto;
   font-weight: 800;
+  margin-left: auto;
+}
+
+.choice-option-badge:first-child {
+  margin-right: 2px;
+  margin-left: 0;
 }
 
 .choice-option-badge.is-danger {

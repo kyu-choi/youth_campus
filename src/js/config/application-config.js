@@ -22,7 +22,44 @@ window.CheongchunCampus.config.applicationForm = {
           notice: "5월 9일 첫 소개팅 전까지 신청금액 5천원!!",
           type: "choice",
           required: true,
-          options: ["다대다 로테이션 소개팅", "1:1 카톡 소개팅"],
+          options: [
+            {
+              value: "다대다 로테이션 소개팅",
+              label: "다대다 로테이션 소개팅",
+              badge: "(마감 임박)",
+              badgeTone: "danger",
+            },
+            "1:1 카톡 소개팅",
+          ],
+        },
+      ],
+    },
+    {
+      eyebrow: "로테이션 일정",
+      title: "로테이션 소개팅 참여 일정을 선택해주세요.",
+      showWhen: {
+        program_type: "다대다 로테이션 소개팅",
+      },
+      fields: [
+        {
+          name: "preferred_date",
+          label: "참여희망날짜",
+          type: "choice",
+          required: true,
+          options: [
+            {
+              value: "5월 9일 (토) 오후 12시",
+              label: "5월 9일 (토) 오후 12시",
+              badge: "(마감 임박)",
+              badgeTone: "danger",
+            },
+          ],
+        },
+        {
+          name: "companion_name",
+          label: "지인 동반 신청자 성함",
+          type: "text",
+          placeholder: "친구와 함께 신청하는 경우에만 작성해주세요.",
         },
       ],
     },
@@ -97,28 +134,6 @@ window.CheongchunCampus.config.applicationForm = {
           type: "tel",
           placeholder: "010-1234-5678",
           required: true,
-        },
-      ],
-    },
-    {
-      eyebrow: "로테이션 일정",
-      title: "로테이션 소개팅 참여 일정을 선택해주세요.",
-      showWhen: {
-        program_type: "다대다 로테이션 소개팅",
-      },
-      fields: [
-        {
-          name: "preferred_date",
-          label: "참여희망날짜",
-          type: "choice",
-          required: true,
-          options: ["5월 9일 (토) 오후 12시"],
-        },
-        {
-          name: "companion_name",
-          label: "지인 동반 신청자 성함",
-          type: "text",
-          placeholder: "친구와 함께 신청하는 경우에만 작성해주세요.",
         },
       ],
     },

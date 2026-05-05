@@ -195,7 +195,12 @@ window.CheongchunCampus.ui.renderApplicationForm =
               optionConfig.badgeTone ? `is-${optionConfig.badgeTone}` : ""
             }`.trim();
             badge.textContent = optionConfig.badge;
-            text.appendChild(badge);
+
+            if (optionConfig.badgePosition === "before") {
+              text.prepend(badge);
+            } else {
+              text.appendChild(badge);
+            }
           }
 
           choice.append(input, text);
