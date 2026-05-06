@@ -26,7 +26,7 @@ window.CheongchunCampus.config.applicationForm = {
             {
               value: "다대다 로테이션 소개팅",
               label: "다대다 로테이션 소개팅",
-              badge: "(마감 임박)",
+              badge: "(남성마감)",
               badgeTone: "danger",
             },
             "1:1 카톡 소개팅",
@@ -50,7 +50,7 @@ window.CheongchunCampus.config.applicationForm = {
             {
               value: "5월 9일 (토) 오후 12시",
               label: "5월 9일 (토) 오후 12시",
-              badge: "(마감 임박)",
+              badge: "(남성마감)",
               badgeTone: "danger",
             },
           ],

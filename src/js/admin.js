@@ -128,8 +128,8 @@ window.CheongchunCampus = window.CheongchunCampus || {};
   function getProgramLabel(programType) {
     return (
       {
-        "다대다 로테이션 소개팅": "로테이션 소개팅",
-        "1:1 카톡 소개팅": "1:1 카톡 소개팅",
+        "다대다 로테이션 소개팅": "로테이션",
+        "1:1 카톡 소개팅": "1대1 카카오톡",
       }[programType] ||
       programType ||
       "-"
@@ -415,6 +415,11 @@ window.CheongchunCampus = window.CheongchunCampus || {};
       tr.classList.toggle("is-selected", state.selectedRow?.id === row.id);
       tr.innerHTML = `
         <td data-label="접수">${escapeHtml(formatDateTime(row.submitted_at))}</td>
+        <td data-label="이름">${escapeHtml(row.name)}</td>
+        <td data-label="나이">${escapeHtml(row.age)}</td>
+        <td data-label="성별"><span class="gender-pill" data-gender="${escapeHtml(
+          row.gender
+        )}">${escapeHtml(row.gender || "-")}</span></td>
         <td data-label="검토"><span class="status-pill" data-status="${escapeHtml(
           row.status
         )}">${escapeHtml(getStatusLabel(row.status))}</span></td>
@@ -427,9 +432,6 @@ window.CheongchunCampus = window.CheongchunCampus || {};
         <td data-label="프로그램"><span class="program-pill" data-program="${escapeHtml(
           row.program_type
         )}">${escapeHtml(getProgramLabel(row.program_type))}</span></td>
-        <td data-label="이름">${escapeHtml(row.name)}</td>
-        <td data-label="성별">${escapeHtml(row.gender)}</td>
-        <td data-label="나이">${escapeHtml(row.age)}</td>
         <td data-label="학교">${escapeHtml(row.school)}</td>
         <td data-label="일정">${escapeHtml(row.preferred_date)}</td>
         <td data-label="메모" class="memo-cell">${escapeHtml(row.admin_note || "")}</td>

@@ -324,7 +324,7 @@ textarea {
   background: #f0fdfa;
 }
 
-.response-table td:nth-child(6),
+.response-table td:nth-child(2),
 .response-table td:nth-child(9),
 .response-table td:nth-child(10) {
   font-weight: 700;
@@ -356,7 +356,7 @@ textarea {
 
 .program-pill {
   display: inline-flex;
-  min-width: 112px;
+  min-width: 78px;
   justify-content: center;
   border-radius: 999px;
   padding: 4px 8px;
@@ -364,6 +364,28 @@ textarea {
   color: #075985;
   font-size: 12px;
   font-weight: 700;
+}
+
+.gender-pill {
+  display: inline-flex;
+  min-width: 44px;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: #f2f4f7;
+  color: #344054;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.gender-pill[data-gender="남성"] {
+  background: #e0eaff;
+  color: var(--admin-blue);
+}
+
+.gender-pill[data-gender="여성"] {
+  background: #fee4e2;
+  color: var(--admin-danger);
 }
 
 .program-pill[data-program="다대다 로테이션 소개팅"] {
