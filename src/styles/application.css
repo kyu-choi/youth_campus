@@ -34,8 +34,8 @@
 .application-description {
   margin: 12px 0 0;
   color: var(--muted);
-  font-size: 0.94rem;
-  line-height: 1.65;
+  font-size: 0.88rem;
+  line-height: 1.75;
   white-space: pre-line;
 }
 

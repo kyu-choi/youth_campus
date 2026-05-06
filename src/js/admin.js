@@ -915,7 +915,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
               (row) => `
                 <tr>
                   ${columns
-                    .map(([, key]) => `<td>${escapeHtml(row[key])}</td>`)
+                    .map(([, key]) => `<td>${escapeHtml(formatSummaryValue(key, row[key]))}</td>`)
                     .join("")}
                 </tr>
               `
@@ -924,6 +924,39 @@ window.CheongchunCampus = window.CheongchunCampus || {};
         </tbody>
       </table>
     `;
+  }
+
+  function formatSummaryValue(key, value) {
+    if (key === "payment_status") {
+      return (
+        {
+          unpaid: "미입금",
+          deposit_paid: "예약금",
+          paid: "입금",
+          refunded: "환불",
+          waived: "면제",
+        }[value] ||
+        value ||
+        "-"
+      );
+    }
+
+    if (key === "matching_status") {
+      return (
+        {
+          unmatched: "미매칭",
+          match: "매칭",
+          matched: "매칭",
+          candidate: "후보",
+          notified: "안내완료",
+          cancelled: "취소",
+        }[value] ||
+        value ||
+        "-"
+      );
+    }
+
+    return value || "-";
   }
 
   elements.loginForm.addEventListener("submit", async (event) => {

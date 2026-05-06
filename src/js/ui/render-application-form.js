@@ -256,11 +256,20 @@ window.CheongchunCampus.ui.renderApplicationForm =
       const homeButton = createHomeButton();
       const success = document.createElement("section");
       const title = document.createElement("h2");
+      const receiptAlert = document.createElement("div");
+      const receiptAlertTitle = document.createElement("strong");
+      const receiptAlertText = document.createElement("span");
       const message = document.createElement("p");
       const kakaoUrl = "http://pf.kakao.com/_BxcVTX";
 
       success.className = "application-complete";
       title.textContent = config.successTitle;
+      receiptAlert.className = "receipt-alert receipt-alert-complete";
+      receiptAlert.setAttribute("role", "note");
+      receiptAlertTitle.textContent = "최종 접수 조건";
+      receiptAlertText.textContent =
+        "카카오톡 채널로 이름 / 학교 / 신청완료를 보내야 최종 접수가 완료됩니다.";
+      receiptAlert.append(receiptAlertTitle, receiptAlertText);
 
       config.successMessage.split(kakaoUrl).forEach((text, index) => {
         if (index > 0) {
@@ -276,7 +285,7 @@ window.CheongchunCampus.ui.renderApplicationForm =
         message.appendChild(document.createTextNode(text));
       });
 
-      success.append(title, message);
+      success.append(title, receiptAlert, message);
       mount.append(homeButton, success);
       mount.scrollIntoView({ block: "start", behavior: "smooth" });
     }

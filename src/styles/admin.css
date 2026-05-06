@@ -253,6 +253,41 @@ textarea {
   flex: 0 1 150px;
 }
 
+@media (min-width: 761px) {
+  .filter-bar {
+    flex-wrap: nowrap;
+  }
+
+  .filter-bar input,
+  .filter-bar select {
+    min-width: 0;
+  }
+
+  .filter-bar input {
+    flex: 1 1 220px;
+  }
+
+  #date-filter {
+    flex: 0 0 150px;
+  }
+
+  #program-filter {
+    flex: 0 0 140px;
+  }
+
+  #gender-filter {
+    flex: 0 0 100px;
+  }
+
+  #payment-filter {
+    flex: 0 0 110px;
+  }
+
+  #matching-filter {
+    flex: 0 0 130px;
+  }
+}
+
 .table-wrap {
   overflow: auto;
   -webkit-overflow-scrolling: touch;
