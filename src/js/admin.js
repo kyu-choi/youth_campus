@@ -366,7 +366,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     elements.candidateCount.textContent = String(
       state.filteredRows.filter(
         (row) =>
-          isOneToOne(row) && (row.matching_status || "unmatched") === "candidate"
+          isOneToOne(row) && (row.matching_status || "unmatched") === "unmatched"
       ).length
     );
     elements.matchedCount.textContent = String(
