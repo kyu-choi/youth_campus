@@ -10,7 +10,7 @@ window.CheongchunCampus.config.applicationForm = {
   submitLabel: "신청완료",
   successTitle: "신청서 작성이 완료되었습니다",
   successMessage:
-    "최종 접수를 위해 청춘 캠퍼스 공식 카카오톡 채널로 아래 정보를 보내주세요.\n\n지역 / 이름 / 학교 / 신청유형\n예: 대구 / 홍길동 / 경북대 / 신규 신청완료\n\n카톡 채널: http://pf.kakao.com/_BxcVTX\n\n확인 후 빠른 시일 내로 연락드리겠습니다.",
+    "최종 접수를 위해 청춘 캠퍼스 공식 카카오톡 채널로 아래 정보를 보내주세요.\n\n이름 / 학교 / 신청완료\n예: 홍길동 / 경북대 / 신청완료\n\n카톡 채널: http://pf.kakao.com/_BxcVTX\n\n확인 후 빠른 시일 내로 연락드리겠습니다.",
   pages: [
     {
       eyebrow: "프로그램 선택",
@@ -113,26 +113,6 @@ window.CheongchunCampus.config.applicationForm = {
           name: "privacy_confirmed",
           label: "개인정보 수집 및 이용 안내를 확인했습니다.",
           type: "checkbox",
-          required: true,
-        },
-      ],
-    },
-    {
-      eyebrow: "신청 유형",
-      title: "신청 유형과 연락처를 확인해주세요.",
-      fields: [
-        {
-          name: "participation_type",
-          label: "신청유형",
-          type: "choice",
-          required: true,
-          options: ["신규 신청", "재신청"],
-        },
-        {
-          name: "phone_confirm",
-          label: "연락처(재확인)",
-          type: "tel",
-          placeholder: "010-1234-5678",
           required: true,
         },
       ],
@@ -242,7 +222,7 @@ window.CheongchunCampus.config.applicationForm = {
           label: "드시고 싶은 음료",
           type: "choice",
           required: true,
-          options: ["아메리카노", "디카페인 아메리카노", "아이스티", "캐모마일", "둥글레차", "물"],
+          options: ["아메리카노", "카페라떼", "바닐라라떼", "아이스티", "오렌지쥬스", "레몬에이드"],
         },
         {
           name: "drink_temperature",
@@ -300,7 +280,7 @@ window.CheongchunCampus.config.applicationForm = {
         {
           name: "kakao_required_confirmed",
           label:
-            "카카오톡 채널로 지역 / 이름 / 학교 / 신청유형을 보내야 최종 접수가 완료됨을 확인했습니다.",
+            "카카오톡 채널로 이름 / 학교 / 신청완료를 보내야 최종 접수가 완료됨을 확인했습니다.",
           type: "checkbox",
           required: true,
         },
