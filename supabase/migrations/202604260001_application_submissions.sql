@@ -8,7 +8,6 @@ create table if not exists public.application_submissions (
   region text,
   school text,
   program_type text,
-  participation_type text,
   preferred_date text,
   payload jsonb not null,
   created_at timestamptz not null default now()
@@ -20,8 +19,7 @@ alter table public.application_submissions
   add column if not exists birth_year integer,
   add column if not exists region text,
   add column if not exists school text,
-  add column if not exists program_type text,
-  add column if not exists participation_type text;
+  add column if not exists program_type text;
 
 create index if not exists application_submissions_created_at_idx
   on public.application_submissions (created_at desc);

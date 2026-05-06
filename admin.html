@@ -60,11 +60,11 @@
             <strong id="paid-count">0</strong>
           </article>
           <article class="summary-card">
-            <span>매칭 후보</span>
+            <span>1:1 매칭 후보</span>
             <strong id="candidate-count">0</strong>
           </article>
           <article class="summary-card">
-            <span>매칭 완료</span>
+            <span>1:1 매칭 완료</span>
             <strong id="matched-count">0</strong>
           </article>
           <article class="summary-card subtle-card">
@@ -78,10 +78,6 @@
           <article class="summary-card subtle-card">
             <span>미입금</span>
             <strong id="unpaid-count">0</strong>
-          </article>
-          <article class="summary-card subtle-card">
-            <span>검토 필요</span>
-            <strong id="review-needed-count">0</strong>
           </article>
         </section>
 
@@ -141,14 +137,6 @@
                 <option value="남성">남성</option>
                 <option value="여성">여성</option>
               </select>
-              <select id="status-filter">
-                <option value="">전체 상태</option>
-                <option value="new">신규</option>
-                <option value="reviewed">검토</option>
-                <option value="matched">매칭</option>
-                <option value="rejected">제외</option>
-                <option value="cancelled">취소</option>
-              </select>
               <select id="payment-filter">
                 <option value="">전체 입금</option>
                 <option value="unpaid">미입금</option>
@@ -158,7 +146,7 @@
                 <option value="waived">면제</option>
               </select>
               <select id="matching-filter">
-                <option value="">전체 매칭</option>
+                <option value="">전체 1:1 매칭</option>
                 <option value="unmatched">미매칭</option>
                 <option value="candidate">후보</option>
                 <option value="matched">매칭완료</option>
@@ -175,13 +163,11 @@
                     <th><button type="button" data-sort-key="name">이름</button></th>
                     <th><button type="button" data-sort-key="age">나이</button></th>
                     <th><button type="button" data-sort-key="gender">성별</button></th>
-                    <th><button type="button" data-sort-key="status">검토</button></th>
                     <th><button type="button" data-sort-key="payment_status">입금</button></th>
-                    <th><button type="button" data-sort-key="matching_status">매칭</button></th>
+                    <th><button type="button" data-sort-key="matching_status">1:1 매칭</button></th>
                     <th><button type="button" data-sort-key="program_type">프로그램</button></th>
                     <th><button type="button" data-sort-key="school">학교</button></th>
                     <th><button type="button" data-sort-key="preferred_date">일정</button></th>
-                    <th>메모</th>
                     <th>매칭</th>
                   </tr>
                 </thead>
@@ -193,30 +179,23 @@
               class="mobile-response-list"
               aria-label="모바일 신청자 목록"
             ></div>
+
+            <section class="summary-tables">
+              <article class="detail-card">
+                <h2>일정별 현황</h2>
+                <div id="response-summary" class="mini-table"></div>
+              </article>
+              <article class="detail-card">
+                <h2>음료 준비 수량</h2>
+                <div id="drink-summary" class="mini-table"></div>
+              </article>
+            </section>
           </div>
 
           <aside class="detail-panel">
             <section class="detail-card">
-              <h2>상세 정보</h2>
-              <div id="empty-detail" class="empty-state">
-                신청자를 선택하면 세부 정보가 표시됩니다.
-              </div>
-              <div id="detail-content" hidden></div>
-            </section>
-
-            <section class="detail-card">
-              <h2>상태 및 메모 수정</h2>
+              <h2>상태 수정</h2>
               <form id="review-form" class="review-form">
-                <label>
-                  검토상태
-                  <select id="review-status">
-                    <option value="new">신규</option>
-                    <option value="reviewed">검토 완료</option>
-                    <option value="matched">매칭 완료</option>
-                    <option value="rejected">제외</option>
-                    <option value="cancelled">취소</option>
-                  </select>
-                </label>
                 <label>
                   입금상태
                   <select id="payment-status">
@@ -227,8 +206,8 @@
                     <option value="waived">면제</option>
                   </select>
                 </label>
-                <label>
-                  매칭상태
+                <label id="matching-status-field">
+                  1:1 매칭상태
                   <select id="matching-status">
                     <option value="unmatched">미매칭</option>
                     <option value="candidate">후보</option>
@@ -237,55 +216,19 @@
                     <option value="cancelled">취소</option>
                   </select>
                 </label>
-                <input
-                  id="review-score"
-                  type="number"
-                  placeholder="점수"
-                  min="0"
-                  max="100"
-                />
-                <input id="review-group" type="text" placeholder="매칭 그룹" />
-                <textarea
-                  id="review-note"
-                  rows="5"
-                  placeholder="관리자 메모"
-                ></textarea>
                 <button class="primary-button" type="submit">저장</button>
                 <p id="review-message" class="form-message" role="status"></p>
               </form>
             </section>
 
             <section class="detail-card">
-              <h2>매칭 만들기</h2>
-              <div class="match-slots">
-                <p>남성: <strong id="selected-male">미선택</strong></p>
-                <p>여성: <strong id="selected-female">미선택</strong></p>
+              <h2>상세 정보</h2>
+              <div id="empty-detail" class="empty-state">
+                신청자를 선택하면 세부 정보가 표시됩니다.
               </div>
-              <form id="match-form" class="review-form">
-                <input id="match-date" type="text" placeholder="행사 일정" />
-                <input id="match-program" type="text" placeholder="프로그램" />
-                <input id="match-group" type="text" placeholder="매칭 그룹" />
-                <textarea
-                  id="match-note"
-                  rows="3"
-                  placeholder="매칭 메모"
-                ></textarea>
-                <button class="primary-button" type="submit">매칭 저장</button>
-                <p id="match-message" class="form-message" role="status"></p>
-              </form>
+              <div id="detail-content" hidden></div>
             </section>
           </aside>
-        </section>
-
-        <section class="summary-tables">
-          <article class="detail-card">
-            <h2>일정별 현황</h2>
-            <div id="response-summary" class="mini-table"></div>
-          </article>
-          <article class="detail-card">
-            <h2>음료 준비 수량</h2>
-            <div id="drink-summary" class="mini-table"></div>
-          </article>
         </section>
       </section>
     </main>

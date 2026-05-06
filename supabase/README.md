@@ -36,7 +36,6 @@
   - 관리자 웹페이지도 이 테이블만 읽고 수정
   - `name`
   - `phone`
-  - `phone_confirm`
   - `applicant_name`
   - `applicant_phone`
   - `kakao_id`
@@ -51,7 +50,6 @@
   - `weight`
   - `smoking`
   - `program_type`
-  - `participation_type`
   - `preferred_date`
   - `companion_name`
   - `preferred_age`
@@ -64,9 +62,8 @@
   - `employment_files`
   - `profile_photos`
   - `payload` (기존 데이터 호환/백업용 JSON)
-  - `status` (`new`, `reviewed`, `matched`, `rejected`, `cancelled`)
   - `payment_status` (`unpaid`, `deposit_paid`, `paid`, `refunded`, `waived`)
-  - `matching_status` (`unmatched`, `candidate`, `matched`, `notified`, `cancelled`)
+  - `matching_status` (`unmatched`, `candidate`, `matched`, `notified`, `cancelled`, 1:1 카톡 소개팅만 사용)
   - `match_group`
   - `matched_with`
   - `score`
@@ -85,6 +82,10 @@
    - 예전에 만든 View와 별도 매칭 테이블이 있다면 삭제
 5. `migrations/202604270007_update_application_content.sql`
    - 카카오톡 채널 URL과 기존 5월 2일 일정 값을 최신 내용으로 보정
+6. `migrations/202605070001_drop_reapplication_fields.sql`
+   - 신청유형/연락처 재확인 컬럼 삭제
+7. `migrations/202605070002_remove_review_status_and_limit_matching_status.sql`
+   - 기존 검토 컬럼 삭제, 매칭상태를 1:1 카톡 소개팅에만 허용
 
 새 Supabase 프로젝트라면 4번은 실행해도 되고 생략해도 됩니다.
 이미 예전 SQL을 실행해서 View나 `application_matches`가 보인다면 4번을 실행하면 정리됩니다.
@@ -97,12 +98,12 @@
 
 1. 웹 신청서는 `application_submissions`의 실제 컬럼에 저장됩니다.
 2. 관리자 웹페이지는 `application_submissions`만 읽어서 목록, 상세, 요약을 표시합니다.
-3. 검토가 끝난 신청자는 `application_submissions.status`를 `reviewed`로 바꾸고, 필요하면 `score`, `admin_note`를 채웁니다.
-4. 매칭 확정 시 남녀 신청자 양쪽의 `matching_status`, `match_group`, `matched_with`를 업데이트합니다.
+3. 관리자는 필요하면 `payment_status`, `score`, `admin_note`를 채웁니다.
+4. 1:1 매칭 확정 시 남녀 신청자 양쪽의 `matching_status`, `match_group`, `matched_with`를 업데이트합니다.
 
 ## 관리자 웹페이지
 
-`admin.html`을 열면 Supabase Dashboard에 들어가지 않고도 신청자 확인, 검토 상태 변경, 메모 저장, 남녀 1:1 매칭 저장을 할 수 있습니다.
+`admin.html`을 열면 Supabase Dashboard에 들어가지 않고도 신청자 확인, 입금 상태 변경, 메모 저장, 남녀 1:1 매칭 저장을 할 수 있습니다.
 관리자 웹페이지는 단순화 이후 `application_submissions` 테이블만 읽고 수정합니다.
 
 관리자 페이지를 쓰려면 Supabase에서 먼저 아래 순서로 설정해야 합니다.
@@ -122,9 +123,8 @@ set is_active = true,
 관리자 화면에서 가능한 작업:
 
 - 신청자 전체 목록 조회와 이름/학교/연락처/카카오톡 검색
-- 일정, 성별, 검토상태, 입금상태, 매칭상태별 필터링
+- 일정, 성별, 입금상태, 1:1 매칭상태별 필터링
 - 표 헤더 클릭 정렬
 - 신청자 상세 정보와 첨부파일 확인
-- `new`, `reviewed`, `matched`, `rejected`, `cancelled` 상태 변경
-- 입금상태, 매칭상태, 점수, 매칭 그룹, 관리자 메모 저장
+- 입금상태, 1:1 매칭상태, 점수, 매칭 그룹, 관리자 메모 저장
 - 남성 1명과 여성 1명을 선택해 `application_submissions`에 매칭 상태 저장

@@ -7,8 +7,6 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     rows: [],
     filteredRows: [],
     selectedRow: null,
-    selectedMale: null,
-    selectedFemale: null,
     sortKey: "submitted_at",
     sortDirection: "desc",
     mobileProgramType: "",
@@ -31,13 +29,11 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     unpaidCount: document.getElementById("unpaid-count"),
     candidateCount: document.getElementById("candidate-count"),
     matchedCount: document.getElementById("matched-count"),
-    reviewNeededCount: document.getElementById("review-needed-count"),
     tableCaption: document.getElementById("table-caption"),
     searchInput: document.getElementById("search-input"),
     dateFilter: document.getElementById("date-filter"),
     programFilter: document.getElementById("program-filter"),
     genderFilter: document.getElementById("gender-filter"),
-    statusFilter: document.getElementById("status-filter"),
     paymentFilter: document.getElementById("payment-filter"),
     matchingFilter: document.getElementById("matching-filter"),
     refreshButton: document.getElementById("refresh-button"),
@@ -49,21 +45,10 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     emptyDetail: document.getElementById("empty-detail"),
     detailContent: document.getElementById("detail-content"),
     reviewForm: document.getElementById("review-form"),
-    reviewStatus: document.getElementById("review-status"),
     paymentStatus: document.getElementById("payment-status"),
+    matchingStatusField: document.getElementById("matching-status-field"),
     matchingStatus: document.getElementById("matching-status"),
-    reviewScore: document.getElementById("review-score"),
-    reviewGroup: document.getElementById("review-group"),
-    reviewNote: document.getElementById("review-note"),
     reviewMessage: document.getElementById("review-message"),
-    selectedMale: document.getElementById("selected-male"),
-    selectedFemale: document.getElementById("selected-female"),
-    matchForm: document.getElementById("match-form"),
-    matchDate: document.getElementById("match-date"),
-    matchProgram: document.getElementById("match-program"),
-    matchGroup: document.getElementById("match-group"),
-    matchNote: document.getElementById("match-note"),
-    matchMessage: document.getElementById("match-message"),
     responseSummary: document.getElementById("response-summary"),
     drinkSummary: document.getElementById("drink-summary"),
   };
@@ -87,18 +72,6 @@ window.CheongchunCampus = window.CheongchunCampus || {};
       dateStyle: "short",
       timeStyle: "short",
     }).format(new Date(value));
-  }
-
-  function getStatusLabel(status) {
-    return (
-      {
-        new: "신규",
-        reviewed: "검토",
-        matched: "매칭",
-        rejected: "제외",
-        cancelled: "취소",
-      }[status] || status || "신규"
-    );
   }
 
   function getPaymentLabel(status) {
@@ -155,6 +128,10 @@ window.CheongchunCampus = window.CheongchunCampus || {};
       gender ||
       "-"
     );
+  }
+
+  function isOneToOne(row) {
+    return row.program_type === "1:1 카톡 소개팅";
   }
 
   function escapeHtml(value) {
@@ -229,7 +206,6 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     const payload = row.payload || {};
     const uploadedFiles = payload.uploaded_files || {};
     const phone = row.phone || row.applicant_phone || payload.phone || "";
-    const phoneConfirm = row.phone_confirm || payload.phone_confirm || "";
     const birthYear = row.birth_year ? Number(row.birth_year) : null;
 
     return {
@@ -237,8 +213,6 @@ window.CheongchunCampus = window.CheongchunCampus || {};
       submitted_at: row.created_at,
       name: row.name || row.applicant_name || payload.name || "",
       phone,
-      phone_confirm: phoneConfirm,
-      phone_mismatch: Boolean(phone && phoneConfirm && phone !== phoneConfirm),
       kakao_id: row.kakao_id || payload.kakao_id || "",
       gender: row.gender || payload.gender || "",
       birth_year: birthYear,
@@ -246,8 +220,6 @@ window.CheongchunCampus = window.CheongchunCampus || {};
       region: row.region || payload.region || "",
       program_type: row.program_type || payload.program_type || "",
       preferred_date: row.preferred_date || payload.preferred_date || "",
-      participation_type:
-        row.participation_type || payload.participation_type || "",
       companion_name: row.companion_name || payload.companion_name || "",
       school: row.school || payload.school || "",
       major: row.major || payload.major || "",
@@ -271,9 +243,11 @@ window.CheongchunCampus = window.CheongchunCampus || {};
         row.profile_photos ||
         uploadedFiles.profile_photo_names ||
         [],
-      status: row.status || "new",
       payment_status: row.payment_status || "unpaid",
-      matching_status: row.matching_status || "unmatched",
+      matching_status:
+        row.program_type === "1:1 카톡 소개팅"
+          ? row.matching_status || "unmatched"
+          : "",
     };
   }
 
@@ -299,7 +273,6 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     const date = elements.dateFilter.value;
     const program = elements.programFilter.value;
     const gender = elements.genderFilter.value;
-    const status = elements.statusFilter.value;
     const paymentStatus = elements.paymentFilter.value;
     const matchingStatus = elements.matchingFilter.value;
 
@@ -322,10 +295,10 @@ window.CheongchunCampus = window.CheongchunCampus || {};
         (!date || row.preferred_date === date) &&
         (!program || row.program_type === program) &&
         (!gender || row.gender === gender) &&
-        (!status || row.status === status) &&
         (!paymentStatus || (row.payment_status || "unpaid") === paymentStatus) &&
         (!matchingStatus ||
-          (row.matching_status || "unmatched") === matchingStatus)
+          (isOneToOne(row) &&
+            (row.matching_status || "unmatched") === matchingStatus))
       );
     });
 
@@ -392,16 +365,15 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     );
     elements.candidateCount.textContent = String(
       state.filteredRows.filter(
-        (row) => (row.matching_status || "unmatched") === "candidate"
+        (row) =>
+          isOneToOne(row) && (row.matching_status || "unmatched") === "candidate"
       ).length
     );
     elements.matchedCount.textContent = String(
       state.filteredRows.filter(
-        (row) => (row.matching_status || "unmatched") === "matched"
+        (row) =>
+          isOneToOne(row) && (row.matching_status || "unmatched") === "matched"
       ).length
-    );
-    elements.reviewNeededCount.textContent = String(
-      state.filteredRows.filter((row) => (row.status || "new") === "new").length
     );
     elements.tableCaption.textContent = `${state.filteredRows.length}명을 표시 중입니다. 헤더를 클릭하면 정렬됩니다.`;
   }
@@ -420,33 +392,38 @@ window.CheongchunCampus = window.CheongchunCampus || {};
         <td data-label="성별"><span class="gender-pill" data-gender="${escapeHtml(
           row.gender
         )}">${escapeHtml(row.gender || "-")}</span></td>
-        <td data-label="검토"><span class="status-pill" data-status="${escapeHtml(
-          row.status
-        )}">${escapeHtml(getStatusLabel(row.status))}</span></td>
         <td data-label="입금"><span class="status-pill" data-status="${escapeHtml(
           row.payment_status || "unpaid"
         )}">${escapeHtml(getPaymentLabel(row.payment_status))}</span></td>
-        <td data-label="매칭"><span class="status-pill" data-status="${escapeHtml(
-          row.matching_status || "unmatched"
-        )}">${escapeHtml(getMatchingLabel(row.matching_status))}</span></td>
+        <td data-label="1:1 매칭">${
+          isOneToOne(row)
+            ? `<span class="status-pill" data-status="${escapeHtml(
+                row.matching_status || "unmatched"
+              )}">${escapeHtml(getMatchingLabel(row.matching_status))}</span>`
+            : "-"
+        }</td>
         <td data-label="프로그램"><span class="program-pill" data-program="${escapeHtml(
           row.program_type
         )}">${escapeHtml(getProgramLabel(row.program_type))}</span></td>
         <td data-label="학교">${escapeHtml(row.school)}</td>
         <td data-label="일정">${escapeHtml(row.preferred_date)}</td>
-        <td data-label="메모" class="memo-cell">${escapeHtml(row.admin_note || "")}</td>
-        <td data-label="매칭 선택"><button class="ghost-button" type="button" data-select-match="${
-          escapeHtml(row.id)
-        }">선택</button></td>
+        <td data-label="매칭 선택">${
+          isOneToOne(row)
+            ? `<button class="ghost-button" type="button" data-select-match="${escapeHtml(
+                row.id
+              )}">상태</button>`
+            : "-"
+        }</td>
       `;
 
       tr.addEventListener("click", () => selectRow(row));
-      tr
-        .querySelector("[data-select-match]")
-        .addEventListener("click", (event) => {
+      tr.querySelector("[data-select-match]")?.addEventListener(
+        "click",
+        (event) => {
           event.stopPropagation();
           selectMatchCandidate(row);
-        });
+        }
+      );
 
       elements.tableBody.appendChild(tr);
     });
@@ -560,9 +537,13 @@ window.CheongchunCampus = window.CheongchunCampus || {};
         <span class="mobile-line-status" data-status="${escapeHtml(
           row.payment_status || "unpaid"
         )}">${escapeHtml(getPaymentLabel(row.payment_status))}</span>
-        <span class="mobile-line-status" data-status="${escapeHtml(
-          row.matching_status || "unmatched"
-        )}">${escapeHtml(getMatchingLabel(row.matching_status))}</span>
+        ${
+          isOneToOne(row)
+            ? `<span class="mobile-line-status" data-status="${escapeHtml(
+                row.matching_status || "unmatched"
+              )}">${escapeHtml(getMatchingLabel(row.matching_status))}</span>`
+            : ""
+        }
       </button>
     `;
 
@@ -585,12 +566,16 @@ window.CheongchunCampus = window.CheongchunCampus || {};
       const actions = document.createElement("div");
       actions.className = "mobile-response-actions";
       actions.innerHTML = `
-        <button class="ghost-button" type="button" data-mobile-match>매칭 선택</button>
-        <button class="primary-button" type="button" data-mobile-edit>상태 수정</button>
+        ${
+          isOneToOne(row)
+            ? '<button class="ghost-button" type="button" data-mobile-match>매칭상태</button>'
+            : ""
+        }
+        <button class="primary-button" type="button" data-mobile-edit>입금 수정</button>
       `;
       actions
         .querySelector("[data-mobile-match]")
-        .addEventListener("click", () => selectMatchCandidate(row));
+        ?.addEventListener("click", () => selectMatchCandidate(row));
       actions.querySelector("[data-mobile-edit]").addEventListener("click", () => {
         elements.reviewForm.scrollIntoView({ behavior: "smooth", block: "start" });
       });
@@ -614,10 +599,10 @@ window.CheongchunCampus = window.CheongchunCampus || {};
       ["상태", row.job],
       ["키/몸무게", [row.height_cm, row.weight_kg].filter(Boolean).join(" / ")],
       ["흡연", row.smoking],
-      ["검토", getStatusLabel(row.status)],
       ["입금", getPaymentLabel(row.payment_status)],
-      ["매칭", getMatchingLabel(row.matching_status)],
-      ["신청유형", row.participation_type],
+      ...(isOneToOne(row)
+        ? [["1:1 매칭", getMatchingLabel(row.matching_status)]]
+        : []),
       ["동반", row.companion_name],
       ["음료", `${row.drink || ""} ${row.drink_temperature || ""}`.trim()],
       ["접수", formatDateTime(row.submitted_at)],
@@ -639,7 +624,6 @@ window.CheongchunCampus = window.CheongchunCampus || {};
       ["회피지인", row.avoided_person],
       ["이상형", row.ideal_type],
       ["자기소개", row.self_intro],
-      ["관리메모", row.admin_note],
     ].forEach(([label, value]) => {
       if (!value) {
         return;
@@ -669,12 +653,11 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     state.selectedRow = row;
     elements.emptyDetail.hidden = true;
     elements.detailContent.hidden = false;
-    elements.reviewStatus.value = row.status || "new";
     elements.paymentStatus.value = row.payment_status || "unpaid";
-    elements.matchingStatus.value = row.matching_status || "unmatched";
-    elements.reviewScore.value = row.score ?? "";
-    elements.reviewGroup.value = row.match_group || "";
-    elements.reviewNote.value = row.admin_note || "";
+    elements.matchingStatusField.hidden = !isOneToOne(row);
+    elements.matchingStatus.value = isOneToOne(row)
+      ? row.matching_status || "unmatched"
+      : "unmatched";
     renderDetail(row);
     renderTable();
   }
@@ -684,6 +667,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     elements.emptyDetail.hidden = false;
     elements.detailContent.hidden = true;
     elements.detailContent.innerHTML = "";
+    elements.matchingStatusField.hidden = true;
     renderTable();
   }
 
@@ -695,12 +679,12 @@ window.CheongchunCampus = window.CheongchunCampus || {};
   function createDetailList(row) {
     const fields = [
       ["접수", formatDateTime(row.submitted_at)],
-      ["검토상태", getStatusLabel(row.status)],
       ["입금상태", getPaymentLabel(row.payment_status)],
-      ["매칭상태", getMatchingLabel(row.matching_status)],
+      ...(isOneToOne(row)
+        ? [["1:1 매칭상태", getMatchingLabel(row.matching_status)]]
+        : []),
       ["이름", row.name],
       ["연락처", row.phone],
-      ["번호확인", row.phone_mismatch ? "재확인 번호 다름" : "일치"],
       ["카카오", row.kakao_id],
       ["성별", row.gender],
       ["나이", row.age],
@@ -711,7 +695,6 @@ window.CheongchunCampus = window.CheongchunCampus || {};
       ["흡연", row.smoking],
       ["일정", row.preferred_date],
       ["프로그램", row.program_type],
-      ["신청유형", row.participation_type],
       ["동반", row.companion_name],
       ["선호연령", row.preferred_age],
       ["회피연령", row.avoided_age],
@@ -782,24 +765,14 @@ window.CheongchunCampus = window.CheongchunCampus || {};
   }
 
   function selectMatchCandidate(row) {
-    if (row.gender === "남성") {
-      state.selectedMale = row;
-    } else if (row.gender === "여성") {
-      state.selectedFemale = row;
-    } else {
-      setMessage(elements.matchMessage, "성별이 남성/여성인 신청자만 선택할 수 있습니다.", true);
+    if (!isOneToOne(row)) {
+      setMessage(elements.reviewMessage, "1:1 카톡 소개팅 신청자만 수정할 수 있습니다.", true);
       return;
     }
 
-    elements.selectedMale.textContent = state.selectedMale?.name || "미선택";
-    elements.selectedFemale.textContent = state.selectedFemale?.name || "미선택";
-    elements.matchDate.value =
-      row.preferred_date || elements.matchDate.value || "";
-    elements.matchProgram.value =
-      row.program_type || elements.matchProgram.value || "";
-    elements.matchGroup.value =
-      row.match_group || elements.matchGroup.value || "";
-    setMessage(elements.matchMessage, "매칭 후보를 선택했습니다.");
+    selectRow(row);
+    elements.reviewForm.scrollIntoView({ behavior: "smooth", block: "start" });
+    setMessage(elements.reviewMessage, "상태를 선택한 뒤 저장해주세요.");
   }
 
   async function saveReview(event) {
@@ -811,14 +784,15 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     }
 
     const updates = {
-      status: elements.reviewStatus.value,
       payment_status: elements.paymentStatus.value,
-      matching_status: elements.matchingStatus.value,
-      score: elements.reviewScore.value ? Number(elements.reviewScore.value) : null,
-      match_group: elements.reviewGroup.value.trim() || null,
-      admin_note: elements.reviewNote.value.trim() || null,
       reviewed_at: new Date().toISOString(),
     };
+
+    if (isOneToOne(state.selectedRow)) {
+      updates.matching_status = elements.matchingStatus.value;
+    } else {
+      updates.matching_status = null;
+    }
 
     const { error } = await client
       .from("application_submissions")
@@ -838,73 +812,6 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     }
   }
 
-  async function saveMatch(event) {
-    event.preventDefault();
-
-    if (!state.selectedMale || !state.selectedFemale) {
-      setMessage(elements.matchMessage, "남성 1명과 여성 1명을 선택해주세요.", true);
-      return;
-    }
-
-    const matchGroup =
-      elements.matchGroup.value.trim() ||
-      `${elements.matchDate.value || "match"}-${Date.now()}`;
-
-    const [maleUpdate, femaleUpdate] = await Promise.all([
-      client
-        .from("application_submissions")
-        .update({
-          status: "matched",
-          matching_status: "matched",
-          match_group: matchGroup,
-          matched_with: state.selectedFemale.id,
-          admin_note: mergeMatchNote(
-            state.selectedMale.admin_note,
-            elements.matchNote.value
-          ),
-          reviewed_at: new Date().toISOString(),
-        })
-        .eq("id", state.selectedMale.id),
-      client
-        .from("application_submissions")
-        .update({
-          status: "matched",
-          matching_status: "matched",
-          match_group: matchGroup,
-          matched_with: state.selectedMale.id,
-          admin_note: mergeMatchNote(
-            state.selectedFemale.admin_note,
-            elements.matchNote.value
-          ),
-          reviewed_at: new Date().toISOString(),
-        })
-        .eq("id", state.selectedFemale.id),
-    ]);
-
-    if (maleUpdate.error || femaleUpdate.error) {
-      setMessage(
-        elements.matchMessage,
-        maleUpdate.error?.message || femaleUpdate.error?.message,
-        true
-      );
-      return;
-    }
-
-    setMessage(elements.matchMessage, "매칭을 저장했습니다.");
-    await loadData();
-  }
-
-  function mergeMatchNote(currentNote, matchNote) {
-    const trimmedMatchNote = matchNote.trim();
-    if (!trimmedMatchNote) {
-      return currentNote || null;
-    }
-
-    return [currentNote, `매칭메모: ${trimmedMatchNote}`]
-      .filter(Boolean)
-      .join("\n");
-  }
-
   function renderSummary() {
     const responseRows = buildResponseSummary();
     const drinkRows = buildDrinkSummary();
@@ -912,9 +819,8 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     elements.responseSummary.innerHTML = renderMiniTable(responseRows, [
       ["일정", "preferred_date"],
       ["프로그램", "program_type"],
-      ["상태", "status"],
       ["입금", "payment_status"],
-      ["매칭", "matching_status"],
+      ["1:1 매칭", "matching_status"],
       ["전체", "total_count"],
       ["남", "male_count"],
       ["여", "female_count"],
@@ -935,18 +841,18 @@ window.CheongchunCampus = window.CheongchunCampus || {};
       const key = [
         row.preferred_date || "",
         row.program_type || "",
-        row.status || "new",
         row.payment_status || "unpaid",
-        row.matching_status || "unmatched",
+        isOneToOne(row) ? row.matching_status || "unmatched" : "",
       ].join("|");
 
       if (!groups.has(key)) {
         groups.set(key, {
           preferred_date: row.preferred_date || "",
           program_type: row.program_type || "",
-          status: row.status || "new",
           payment_status: row.payment_status || "unpaid",
-          matching_status: row.matching_status || "unmatched",
+          matching_status: isOneToOne(row)
+            ? row.matching_status || "unmatched"
+            : "-",
           total_count: 0,
           male_count: 0,
           female_count: 0,
@@ -969,24 +875,26 @@ window.CheongchunCampus = window.CheongchunCampus || {};
   function buildDrinkSummary() {
     const groups = new Map();
 
-    state.rows.forEach((row) => {
-      const key = [
-        row.preferred_date || "",
-        row.drink || "",
-        row.drink_temperature || "",
-      ].join("|");
+    state.rows
+      .filter((row) => row.payment_status === "paid")
+      .forEach((row) => {
+        const key = [
+          row.preferred_date || "",
+          row.drink || "",
+          row.drink_temperature || "",
+        ].join("|");
 
-      if (!groups.has(key)) {
-        groups.set(key, {
-          preferred_date: row.preferred_date || "",
-          drink: row.drink || "",
-          drink_temperature: row.drink_temperature || "",
-          total_count: 0,
-        });
-      }
+        if (!groups.has(key)) {
+          groups.set(key, {
+            preferred_date: row.preferred_date || "",
+            drink: row.drink || "",
+            drink_temperature: row.drink_temperature || "",
+            total_count: 0,
+          });
+        }
 
-      groups.get(key).total_count += 1;
-    });
+        groups.get(key).total_count += 1;
+      });
 
     return Array.from(groups.values());
   }
@@ -1047,7 +955,6 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     elements.dateFilter,
     elements.programFilter,
     elements.genderFilter,
-    elements.statusFilter,
     elements.paymentFilter,
     elements.matchingFilter,
   ].forEach((element) => {
@@ -1057,7 +964,6 @@ window.CheongchunCampus = window.CheongchunCampus || {};
 
   elements.refreshButton.addEventListener("click", loadData);
   elements.reviewForm.addEventListener("submit", saveReview);
-  elements.matchForm.addEventListener("submit", saveMatch);
   elements.mobileProgramButtons.forEach((button) => {
     button.addEventListener("click", () => {
       const nextProgram = button.dataset.mobileProgram;

@@ -433,6 +433,33 @@ textarea {
 .detail-panel {
   display: grid;
   gap: 16px;
+  position: sticky;
+  top: 16px;
+  align-self: start;
+  overflow: visible;
+}
+
+.detail-panel .detail-card:last-child {
+  min-height: 180px;
+}
+
+.detail-panel .review-form {
+  gap: 6px;
+}
+
+.detail-panel .review-form label {
+  grid-template-columns: 92px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-panel .review-form select {
+  min-height: 36px;
+  padding: 7px 10px;
+}
+
+.detail-panel .review-form .primary-button {
+  min-height: 38px;
 }
 
 .empty-state {
@@ -479,20 +506,9 @@ textarea {
   cursor: pointer;
 }
 
-.match-slots {
-  display: grid;
-  gap: 6px;
-  margin-bottom: 12px;
-  color: var(--admin-muted);
-}
-
-.match-slots p {
-  margin-bottom: 0;
-}
-
 .summary-tables {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 16px;
   margin-top: 16px;
 }
@@ -534,6 +550,16 @@ textarea {
 
   .detail-panel {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    position: static;
+    max-height: none;
+  }
+
+  .detail-panel .detail-card:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .detail-panel .review-form label {
+    grid-template-columns: 84px minmax(0, 1fr);
   }
 }
 
@@ -931,7 +957,7 @@ textarea {
     font-size: 12px;
   }
 
-  .detail-panel .detail-card:first-child {
+  .detail-panel .detail-card:last-child {
     display: none;
   }
 
@@ -941,7 +967,7 @@ textarea {
   }
 
   .review-form {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 8px;
   }
 
@@ -966,18 +992,15 @@ textarea {
   }
 
   .review-form textarea {
-    min-height: 76px;
+    min-height: 58px;
   }
 
   .review-form .primary-button {
     min-height: 38px;
   }
 
-  .match-slots {
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    margin-bottom: 8px;
-    font-size: 12px;
+  .detail-panel .review-form label {
+    grid-template-columns: 82px minmax(0, 1fr);
   }
 
   .summary-tables {
@@ -1091,7 +1114,4 @@ textarea {
     grid-template-columns: 1fr;
   }
 
-  .match-slots {
-    grid-template-columns: 1fr;
-  }
 }

@@ -27,7 +27,6 @@ window.CheongchunCampus.services.submitApplication =
         payload: payloadWithFiles,
         name: payload.name,
         phone: payload.phone,
-        phone_confirm: payload.phone_confirm,
         applicant_name: payload.name,
         applicant_phone: payload.phone,
         kakao_id: payload.kakao_id,
@@ -42,7 +41,8 @@ window.CheongchunCampus.services.submitApplication =
         weight: toNullableNumber(payload.weight),
         smoking: payload.smoking,
         program_type: payload.program_type,
-        participation_type: payload.participation_type,
+        matching_status:
+          payload.program_type === "1:1 카톡 소개팅" ? "unmatched" : null,
         preferred_date: payload.preferred_date,
         companion_name: payload.companion_name,
         preferred_age: payload.preferred_age,

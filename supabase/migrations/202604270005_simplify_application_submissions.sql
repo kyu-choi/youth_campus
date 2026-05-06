@@ -1,7 +1,6 @@
 alter table public.application_submissions
   add column if not exists name text,
   add column if not exists phone text,
-  add column if not exists phone_confirm text,
   add column if not exists privacy_confirmed boolean,
   add column if not exists companion_name text,
   add column if not exists major text,
@@ -24,9 +23,8 @@ alter table public.application_submissions
   add column if not exists after_meeting_confirmed boolean,
   add column if not exists refund_confirmed boolean,
   add column if not exists kakao_required_confirmed boolean,
-  add column if not exists status text not null default 'new',
   add column if not exists payment_status text not null default 'unpaid',
-  add column if not exists matching_status text not null default 'unmatched',
+  add column if not exists matching_status text,
   add column if not exists match_group text,
   add column if not exists matched_with uuid references public.application_submissions(id),
   add column if not exists admin_note text,
@@ -37,7 +35,6 @@ update public.application_submissions
 set
   name = coalesce(name, applicant_name, payload->>'name'),
   phone = coalesce(phone, applicant_phone, payload->>'phone'),
-  phone_confirm = coalesce(phone_confirm, payload->>'phone_confirm'),
   privacy_confirmed = coalesce(privacy_confirmed, (payload->>'privacy_confirmed')::boolean),
   companion_name = coalesce(companion_name, payload->>'companion_name'),
   major = coalesce(major, payload->>'major'),
@@ -96,7 +93,6 @@ create index if not exists application_submissions_phone_idx
 grant insert on public.application_submissions to anon;
 grant select on public.application_submissions to authenticated;
 grant update (
-  status,
   payment_status,
   matching_status,
   match_group,
