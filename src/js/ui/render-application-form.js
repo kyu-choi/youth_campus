@@ -268,7 +268,7 @@ window.CheongchunCampus.ui.renderApplicationForm =
       receiptAlert.setAttribute("role", "note");
       receiptAlertTitle.textContent = "최종 접수 조건";
       receiptAlertText.textContent =
-        "카카오톡 채널로 이름 / 학교 / 신청완료를 보내야 최종 접수가 완료됩니다.";
+        "카카오톡 채널로 이름 / 학교 / 로테이션 or 1대1신청완료를 보내야 최종 접수가 완료됩니다.";
       receiptAlert.append(receiptAlertTitle, receiptAlertText);
 
       config.successMessage.split(kakaoUrl).forEach((text, index) => {
