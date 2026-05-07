@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#58c3b2" />
+    <title>청춘 캠퍼스 리뷰 관리자</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Inter:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="src/styles/admin.css" />
+  </head>
+  <body>
+    <main class="admin-shell">
+      <header class="admin-topbar">
+        <div>
+          <p class="admin-eyebrow">Cheongchun Campus</p>
+          <h1>리뷰 관리</h1>
+        </div>
+        <div class="admin-session">
+          <span id="admin-email"></span>
+          <button id="logout-button" class="ghost-button" type="button" hidden>
+            로그아웃
+          </button>
+        </div>
+      </header>
+
+      <section id="login-panel" class="login-panel">
+        <form id="login-form" class="login-card">
+          <h2>관리자 로그인</h2>
+          <label>
+            이메일
+            <input id="login-email" type="email" autocomplete="email" required />
+          </label>
+          <label>
+            비밀번호
+            <input
+              id="login-password"
+              type="password"
+              autocomplete="current-password"
+              required
+            />
+          </label>
+          <button class="primary-button" type="submit">로그인</button>
+          <p id="login-message" class="form-message" role="status"></p>
+        </form>
+      </section>
+
+      <section id="admin-panel" class="admin-panel" hidden>
+        <section class="summary-grid" aria-label="리뷰 요약">
+          <article class="summary-card">
+            <span>전체 리뷰</span>
+            <strong id="total-count">0</strong>
+          </article>
+          <article class="summary-card">
+            <span>애프터 있음</span>
+            <strong id="after-count">0</strong>
+          </article>
+          <article class="summary-card">
+            <span>상호 선택</span>
+            <strong id="mutual-count">0</strong>
+          </article>
+          <article class="summary-card subtle-card">
+            <span>불편 신고</span>
+            <strong id="discomfort-count">0</strong>
+          </article>
+        </section>
+
+        <section class="tool-grid">
+          <div class="table-panel">
+            <div class="panel-heading">
+              <div>
+                <h2>리뷰 목록</h2>
+                <p id="table-caption">필터 조건에 맞는 리뷰를 표시합니다.</p>
+              </div>
+              <button id="refresh-button" class="ghost-button" type="button">
+                새로고침
+              </button>
+            </div>
+
+            <div class="filter-bar">
+              <input
+                id="search-input"
+                type="search"
+                placeholder="이름, 번호, 선택 상대, 후기 검색"
+              />
+              <select id="date-filter">
+                <option value="">전체 날짜</option>
+              </select>
+              <select id="gender-filter">
+                <option value="">전체 성별</option>
+                <option value="남성">남성</option>
+                <option value="여성">여성</option>
+                <option value="기타 / 응답하지 않음">기타</option>
+              </select>
+              <select id="after-filter">
+                <option value="">애프터 전체</option>
+                <option value="있었다">있었다</option>
+                <option value="없었다">없었다</option>
+              </select>
+              <select id="satisfaction-filter">
+                <option value="">만족도 전체</option>
+                <option value="매우 만족">매우 만족</option>
+                <option value="만족">만족</option>
+                <option value="보통">보통</option>
+                <option value="아쉬움">아쉬움</option>
+                <option value="매우 아쉬움">매우 아쉬움</option>
+              </select>
+            </div>
+
+            <div class="table-wrap">
+              <table class="response-table">
+                <thead>
+                  <tr>
+                    <th><button type="button" data-sort-key="submitted_at">제출</button></th>
+                    <th><button type="button" data-sort-key="event_date">날짜</button></th>
+                    <th><button type="button" data-sort-key="reviewer_name">이름</button></th>
+                    <th><button type="button" data-sort-key="participant_number">본인번호</button></th>
+                    <th><button type="button" data-sort-key="overall_satisfaction">만족도</button></th>
+                    <th><button type="button" data-sort-key="has_after_interest">애프터</button></th>
+                    <th>1순위</th>
+                    <th>2순위</th>
+                    <th>3순위</th>
+                  </tr>
+                </thead>
+                <tbody id="review-table-body"></tbody>
+              </table>
+            </div>
+            <div
+              id="mobile-review-list"
+              class="mobile-response-list"
+              aria-label="모바일 리뷰 목록"
+            ></div>
+          </div>
+
+          <aside class="detail-panel">
+            <section class="detail-card">
+              <h2>상호 선택 후보</h2>
+              <div id="mutual-list" class="mini-table"></div>
+            </section>
+
+            <section class="detail-card">
+              <h2>상세 정보</h2>
+              <div id="empty-detail" class="empty-state">
+                리뷰를 선택하면 세부 정보가 표시됩니다.
+              </div>
+              <div id="detail-content" hidden></div>
+              <p id="review-message" class="form-message" role="status"></p>
+            </section>
+          </aside>
+        </section>
+      </section>
+    </main>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script defer src="src/js/config/supabase-config.js"></script>
+    <script defer src="src/js/services/supabase-client.js"></script>
+    <script defer src="src/js/review-admin.js"></script>
+  </body>
+</html>

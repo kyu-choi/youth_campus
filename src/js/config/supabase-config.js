@@ -8,5 +8,7 @@ window.CheongchunCampus.config.supabaseConfig = {
   landingContentTable: "landing_content",
   landingLinksTable: "landing_links",
   applicationSubmissionsTable: "application_submissions",
+  reviewSubmissionsTable: "review_submissions",
+  reviewEventDatesView: "review_event_dates",
   applicationFilesBucket: "application-files",
 };
