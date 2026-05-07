@@ -1,5 +1,5 @@
 .review-page {
-  padding: 18px 14px 40px;
+  padding: 12px 12px 36px;
 }
 
 .review-shell {
@@ -14,14 +14,77 @@
   border-radius: 12px;
 }
 
+.review-card,
+.review-complete {
+  padding: 20px 14px;
+}
+
+.review-card .application-title {
+  font-size: 1.42rem;
+  line-height: 1.28;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.review-card .application-description,
+.review-complete p {
+  font-size: 0.92rem;
+  line-height: 1.72;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
 .review-notice {
-  margin: 14px 0 0;
-  padding: 12px;
+  margin: 12px 0 0;
+  padding: 11px 12px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.74);
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 0.84rem;
   line-height: 1.65;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.review-card .application-fields {
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.review-card .application-label {
+  font-size: 0.94rem;
+  line-height: 1.5;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.review-card .choice-option,
+.review-card .consent-option {
+  min-height: 42px;
+  padding: 11px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.review-card input,
+.review-card select,
+.review-card textarea {
+  font-size: 16px;
+}
+
+.review-card .application-actions {
+  margin-top: 22px;
+}
+
+.review-card .application-next {
+  width: 100%;
+}
+
+.review-complete h2 {
+  font-size: 1.48rem;
+  line-height: 1.32;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 .application-field select {
@@ -48,21 +111,67 @@
 
 .review-complete-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 10px;
-  margin-top: 22px;
+  margin-top: 20px;
 }
 
 .review-link-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
   min-height: 44px;
+  padding: 0 14px;
+  margin-left: 0;
   text-decoration: none;
+  text-align: center;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+.application-complete .review-kakao-button {
+  border: 1px solid rgba(43, 35, 0, 0.14);
+  background: #fee500;
+  color: #241e1f;
+  box-shadow:
+    rgba(36, 30, 31, 0.12) 0 1px 2px 0,
+    rgba(36, 30, 31, 0.12) 0 8px 18px -10px;
+}
+
+.application-complete .review-kakao-button:hover {
+  background: #f6d900;
+  color: #241e1f;
 }
 
 @media (min-width: 700px) {
   .review-page {
     padding: 32px 24px 56px;
+  }
+
+  .review-card,
+  .review-complete {
+    padding: 42px 36px;
+  }
+
+  .review-card .application-title {
+    font-size: 2.08rem;
+  }
+
+  .review-complete h2 {
+    font-size: 2rem;
+  }
+
+  .review-complete-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .review-link-button {
+    width: auto;
+  }
+
+  .review-card .application-next {
+    width: auto;
   }
 }

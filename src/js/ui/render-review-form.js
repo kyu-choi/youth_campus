@@ -221,7 +221,7 @@ window.CheongchunCampus.ui.renderReviewForm =
       message.textContent = config.successMessage;
       actions.className = "review-complete-actions";
       actions.append(
-        createLinkButton(config.kakaoUrl, "카카오톡 채널로 이동하기", "application-next review-link-button"),
+        createLinkButton(config.kakaoUrl, "카카오톡 채널로 이동하기", "application-next review-link-button review-kakao-button"),
         createLinkButton("index.html", "메인 페이지로 돌아가기", "application-back review-link-button")
       );
       section.append(title, message, actions);
