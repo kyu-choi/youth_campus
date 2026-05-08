@@ -89,13 +89,6 @@ window.CheongchunCampus.ui.renderReviewForm =
         return false;
       }
 
-      if (values.phone_last4 && !/^\d{4}$/.test(values.phone_last4)) {
-        const target = mount.querySelector('[data-field="phone_last4"]');
-        target?.classList.add("is-invalid");
-        target?.scrollIntoView({ block: "center", behavior: "smooth" });
-        return false;
-      }
-
       return true;
     }
 

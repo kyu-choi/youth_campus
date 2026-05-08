@@ -28,13 +28,11 @@ window.CheongchunCampus.config.reviewForm = {
       required: true,
     },
     {
-      name: "phone_last4",
-      label: "휴대폰 번호 뒷자리를 입력해주세요.",
+      name: "invite_kakao_id",
+      label: "초대용 카카오톡 ID를 입력해주세요.",
       type: "text",
-      placeholder: "예: 1234",
+      placeholder: "예: kakao_id",
       required: true,
-      inputMode: "numeric",
-      maxLength: 4,
     },
     {
       name: "participant_gender",
@@ -56,13 +54,6 @@ window.CheongchunCampus.config.reviewForm = {
       type: "choice",
       required: true,
       options: ["매우 만족", "만족", "보통", "아쉬움", "매우 아쉬움"],
-    },
-    {
-      name: "conversation_time",
-      label: "로테이션 대화 시간은 어땠나요?",
-      type: "choice",
-      required: true,
-      options: ["너무 짧았다", "조금 짧았다", "적당했다", "조금 길었다", "너무 길었다"],
     },
     {
       name: "traffic_source",
@@ -131,19 +122,6 @@ window.CheongchunCampus.config.reviewForm = {
       label: "다음 행사에도 참여할 의향이 있나요?",
       type: "choice",
       options: ["있다", "고민해볼 것 같다", "없다"],
-    },
-    {
-      name: "had_discomfort",
-      label: "행사 중 불편했던 상황이 있었나요?",
-      type: "choice",
-      options: ["없었다", "있었다"],
-    },
-    {
-      name: "discomfort_detail",
-      label: "불편했던 내용을 간단히 적어주세요.",
-      type: "textarea",
-      placeholder: "운영 개선 및 안전한 행사 진행을 위해서만 확인합니다.",
-      showWhen: { had_discomfort: "있었다" },
     },
     {
       name: "operation_consent",

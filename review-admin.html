@@ -63,10 +63,6 @@
             <span>상호 선택</span>
             <strong id="mutual-count">0</strong>
           </article>
-          <article class="summary-card subtle-card">
-            <span>불편 신고</span>
-            <strong id="discomfort-count">0</strong>
-          </article>
         </section>
 
         <section class="tool-grid">
@@ -85,7 +81,7 @@
               <input
                 id="search-input"
                 type="search"
-                placeholder="이름, 번호, 선택 상대, 후기 검색"
+                placeholder="이름, 카카오톡 ID, 참가자 번호, 선택 상대, 후기 검색"
               />
               <select id="date-filter">
                 <option value="">전체 날짜</option>
@@ -118,6 +114,7 @@
                     <th><button type="button" data-sort-key="submitted_at">제출</button></th>
                     <th><button type="button" data-sort-key="event_date">날짜</button></th>
                     <th><button type="button" data-sort-key="reviewer_name">이름</button></th>
+                    <th><button type="button" data-sort-key="invite_kakao_id">카카오ID</button></th>
                     <th><button type="button" data-sort-key="participant_number">본인번호</button></th>
                     <th><button type="button" data-sort-key="overall_satisfaction">만족도</button></th>
                     <th><button type="button" data-sort-key="has_after_interest">애프터</button></th>

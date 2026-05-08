@@ -23,7 +23,6 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     totalCount: document.getElementById("total-count"),
     afterCount: document.getElementById("after-count"),
     mutualCount: document.getElementById("mutual-count"),
-    discomfortCount: document.getElementById("discomfort-count"),
     tableCaption: document.getElementById("table-caption"),
     searchInput: document.getElementById("search-input"),
     dateFilter: document.getElementById("date-filter"),
@@ -131,14 +130,18 @@ window.CheongchunCampus = window.CheongchunCampus || {};
       submitted_at: row.created_at,
       event_date: row.event_date || payload.event_date || "",
       reviewer_name: row.reviewer_name || payload.name || "",
-      phone_last4: row.phone_last4 || payload.phone_last4 || "",
+      invite_kakao_id:
+        row.invite_kakao_id ||
+        payload.invite_kakao_id ||
+        row.phone_last4 ||
+        payload.phone_last4 ||
+        "",
       participant_gender:
         row.participant_gender || payload.participant_gender || "",
       participant_number:
         row.participant_number || payload.participant_number || "",
       overall_satisfaction:
         row.overall_satisfaction || payload.overall_satisfaction || "",
-      conversation_time: row.conversation_time || payload.conversation_time || "",
       traffic_source: row.traffic_source || payload.traffic_source || "",
       has_after_interest:
         row.has_after_interest || payload.has_after_interest || "",
@@ -151,8 +154,6 @@ window.CheongchunCampus = window.CheongchunCampus || {};
         row.improvement_points || payload.improvement_points || "",
       next_participation:
         row.next_participation || payload.next_participation || "",
-      had_discomfort: row.had_discomfort || payload.had_discomfort || "",
-      discomfort_detail: row.discomfort_detail || payload.discomfort_detail || "",
     };
   }
 
@@ -184,7 +185,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
       const haystack = [
         row.event_date,
         row.reviewer_name,
-        row.phone_last4,
+        row.invite_kakao_id,
         row.participant_gender,
         row.participant_number,
         row.first_choice,
@@ -193,7 +194,6 @@ window.CheongchunCampus = window.CheongchunCampus || {};
         row.choice_reason,
         row.good_points,
         row.improvement_points,
-        row.discomfort_detail,
       ]
         .filter(Boolean)
         .join(" ")
@@ -237,9 +237,6 @@ window.CheongchunCampus = window.CheongchunCampus || {};
       state.filteredRows.filter((row) => row.has_after_interest === "있었다").length
     );
     elements.mutualCount.textContent = String(mutualPairs.length);
-    elements.discomfortCount.textContent = String(
-      state.filteredRows.filter((row) => row.had_discomfort === "있었다").length
-    );
     elements.tableCaption.textContent = `${state.filteredRows.length}개의 리뷰를 표시 중입니다.`;
   }
 
@@ -254,6 +251,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
         <td data-label="제출">${escapeHtml(formatDateTime(row.submitted_at))}</td>
         <td data-label="날짜">${escapeHtml(row.event_date)}</td>
         <td data-label="이름">${escapeHtml(row.reviewer_name)}</td>
+        <td data-label="카카오ID">${escapeHtml(row.invite_kakao_id || "-")}</td>
         <td data-label="본인번호">${escapeHtml(row.participant_number)}</td>
         <td data-label="만족도">${escapeHtml(row.overall_satisfaction)}</td>
         <td data-label="애프터">${escapeHtml(row.has_after_interest)}</td>
@@ -276,6 +274,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     card.innerHTML = `
       <button class="mobile-response-summary" type="button">
         <span class="mobile-line-name">${escapeHtml(row.reviewer_name || "이름 없음")}</span>
+        <span>${escapeHtml(row.invite_kakao_id || "-")}</span>
         <span>${escapeHtml(row.participant_number || "-")}</span>
         <span>${escapeHtml(row.event_date || "-")}</span>
         <span>${escapeHtml(row.overall_satisfaction || "-")}</span>
@@ -303,11 +302,10 @@ window.CheongchunCampus = window.CheongchunCampus || {};
       ["제출", formatDateTime(row.submitted_at)],
       ["참여 날짜", row.event_date],
       ["이름", row.reviewer_name],
-      ["휴대폰 뒷자리", row.phone_last4],
+      ["초대용 카카오톡 ID", row.invite_kakao_id],
       ["성별", row.participant_gender],
       ["본인 참가자 번호", row.participant_number],
       ["전체 만족도", row.overall_satisfaction],
-      ["대화 시간", row.conversation_time],
       ["유입 경로", row.traffic_source],
       ["애프터 여부", row.has_after_interest],
       ["1순위", row.first_choice],
@@ -317,8 +315,6 @@ window.CheongchunCampus = window.CheongchunCampus || {};
       ["좋았던 점", row.good_points],
       ["아쉬웠던 점", row.improvement_points],
       ["다음 참여 의향", row.next_participation],
-      ["불편 상황", row.had_discomfort],
-      ["불편 내용", row.discomfort_detail],
     ];
 
     elements.detailContent.innerHTML = `
