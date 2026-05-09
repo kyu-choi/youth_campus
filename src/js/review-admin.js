@@ -557,7 +557,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
         const secondChoice = getMatchingChoices(other).find(
           (choice) => choice.number === myNumber
         );
-        const key = [row.id, other.id].sort().join("|");
+        const key = [myNumber, otherNumber].sort().join("|");
         if (seen.has(key)) {
           return;
         }
