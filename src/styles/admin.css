@@ -206,6 +206,17 @@ textarea {
   line-height: 1.1;
 }
 
+.summary-card.wide-card {
+  grid-column: span 2;
+}
+
+.summary-card.wide-card strong {
+  overflow: hidden;
+  font-size: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .tool-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(380px, 440px);
@@ -371,6 +382,14 @@ textarea {
   text-overflow: ellipsis;
 }
 
+.response-table .choice-cell {
+  max-width: 180px;
+  overflow: hidden;
+  color: #344054;
+  font-weight: 700;
+  text-overflow: ellipsis;
+}
+
 .memo-cell {
   max-width: 260px;
   overflow: hidden;
@@ -478,6 +497,109 @@ textarea {
   min-height: 180px;
 }
 
+.vote-ranking,
+.choice-flow {
+  display: grid;
+  gap: 8px;
+  max-height: 320px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.vote-card {
+  border: 1px solid #edf1ee;
+  border-radius: 8px;
+  background: #fbfcfd;
+  padding: 10px;
+}
+
+.vote-card-main {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.rank-badge {
+  display: inline-grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 999px;
+  background: #0f766e;
+  color: #fff;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.vote-card-main strong {
+  display: block;
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vote-card-main p {
+  margin: 2px 0 0;
+  color: var(--admin-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.vote-card-main b {
+  color: var(--admin-accent-dark);
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 18px;
+}
+
+.vote-card-voters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.vote-card-voters span {
+  border-radius: 999px;
+  background: #eef4f3;
+  padding: 4px 7px;
+  color: #344054;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.choice-flow-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #edf1ee;
+  border-radius: 8px;
+  background: #fff;
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.choice-flow-row span {
+  overflow: hidden;
+  color: #344054;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.choice-flow-row strong {
+  border-radius: 999px;
+  background: #fff3d6;
+  padding: 3px 7px;
+  color: var(--admin-warn);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
 .detail-panel .review-form {
   gap: 6px;
 }
@@ -583,6 +705,10 @@ textarea {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
+  .summary-card.wide-card {
+    grid-column: span 2;
+  }
+
   .detail-panel {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     position: static;
@@ -686,6 +812,10 @@ textarea {
     margin-top: 2px;
     font-size: 18px;
     line-height: 1.1;
+  }
+
+  .summary-card.wide-card strong {
+    font-size: 14px;
   }
 
   .tool-grid {
@@ -807,10 +937,10 @@ textarea {
     display: grid;
     grid-template-columns:
       minmax(64px, 1fr)
-      30px
       40px
       58px
-      62px;
+      62px
+      minmax(68px, 1fr);
     align-items: center;
     width: 100%;
     gap: 4px;
@@ -845,6 +975,11 @@ textarea {
     background: #f2f4f7;
     color: #344054;
     text-align: center;
+  }
+
+  .mobile-line-choice {
+    color: var(--admin-accent-dark);
+    font-weight: 800;
   }
 
   .mobile-line-gender,
@@ -1082,6 +1217,20 @@ textarea {
   .mini-table td {
     font-size: 11px;
   }
+
+  .vote-ranking,
+  .choice-flow {
+    max-height: none;
+  }
+
+  .choice-flow-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 5px;
+  }
+
+  .choice-flow-row strong {
+    width: fit-content;
+  }
 }
 
 @media (max-width: 420px) {
@@ -1120,10 +1269,10 @@ textarea {
   .mobile-response-summary {
     grid-template-columns:
       minmax(54px, 1fr)
-      26px
       36px
       52px
-      56px;
+      56px
+      minmax(58px, 1fr);
     gap: 3px;
     padding-right: 6px;
     padding-left: 6px;

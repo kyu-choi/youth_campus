@@ -23,6 +23,8 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     totalCount: document.getElementById("total-count"),
     afterCount: document.getElementById("after-count"),
     mutualCount: document.getElementById("mutual-count"),
+    choiceCount: document.getElementById("choice-count"),
+    topVoteRecipient: document.getElementById("top-vote-recipient"),
     tableCaption: document.getElementById("table-caption"),
     searchInput: document.getElementById("search-input"),
     dateFilter: document.getElementById("date-filter"),
@@ -32,6 +34,8 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     refreshButton: document.getElementById("refresh-button"),
     tableBody: document.getElementById("review-table-body"),
     mobileList: document.getElementById("mobile-review-list"),
+    voteRanking: document.getElementById("vote-ranking"),
+    choiceFlow: document.getElementById("choice-flow"),
     mutualList: document.getElementById("mutual-list"),
     emptyDetail: document.getElementById("empty-detail"),
     detailContent: document.getElementById("detail-content"),
@@ -211,6 +215,8 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     sortRows();
     renderCounters();
     renderTable();
+    renderVoteRanking();
+    renderChoiceFlow();
     renderMutualList();
   }
 
@@ -232,11 +238,20 @@ window.CheongchunCampus = window.CheongchunCampus || {};
 
   function renderCounters() {
     const mutualPairs = getMutualPairs(state.filteredRows);
+    const voteStats = getVoteStats(state.filteredRows);
+    const topRecipient = voteStats[0];
+
     elements.totalCount.textContent = String(state.filteredRows.length);
     elements.afterCount.textContent = String(
       state.filteredRows.filter((row) => row.has_after_interest === "있었다").length
     );
     elements.mutualCount.textContent = String(mutualPairs.length);
+    elements.choiceCount.textContent = String(
+      voteStats.reduce((sum, item) => sum + item.total, 0)
+    );
+    elements.topVoteRecipient.textContent = topRecipient
+      ? `${topRecipient.number} ${topRecipient.name || ""} (${topRecipient.total}표)`.trim()
+      : "-";
     elements.tableCaption.textContent = `${state.filteredRows.length}개의 리뷰를 표시 중입니다.`;
   }
 
@@ -255,9 +270,9 @@ window.CheongchunCampus = window.CheongchunCampus || {};
         <td data-label="본인번호">${escapeHtml(row.participant_number)}</td>
         <td data-label="만족도">${escapeHtml(row.overall_satisfaction)}</td>
         <td data-label="애프터">${escapeHtml(row.has_after_interest)}</td>
-        <td data-label="1순위">${escapeHtml(row.first_choice || "-")}</td>
-        <td data-label="2순위">${escapeHtml(row.second_choice || "-")}</td>
-        <td data-label="3순위">${escapeHtml(row.third_choice || "-")}</td>
+        <td class="choice-cell" data-label="1순위">${renderChoiceCell(row.first_choice)}</td>
+        <td class="choice-cell" data-label="2순위">${renderChoiceCell(row.second_choice)}</td>
+        <td class="choice-cell" data-label="3순위">${renderChoiceCell(row.third_choice)}</td>
       `;
       tr.addEventListener("click", () => selectRow(row));
       elements.tableBody.appendChild(tr);
@@ -274,11 +289,12 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     card.innerHTML = `
       <button class="mobile-response-summary" type="button">
         <span class="mobile-line-name">${escapeHtml(row.reviewer_name || "이름 없음")}</span>
-        <span>${escapeHtml(row.invite_kakao_id || "-")}</span>
         <span>${escapeHtml(row.participant_number || "-")}</span>
         <span>${escapeHtml(row.event_date || "-")}</span>
-        <span>${escapeHtml(row.overall_satisfaction || "-")}</span>
         <span class="mobile-line-status">${escapeHtml(row.has_after_interest || "-")}</span>
+        <span class="mobile-line-choice">${escapeHtml(
+          getParticipantLabel(row.first_choice) || "선택 없음"
+        )}</span>
       </button>
     `;
 
@@ -298,6 +314,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
   }
 
   function renderDetail(row) {
+    const inboundChoices = getInboundChoices(row, state.filteredRows);
     const fields = [
       ["제출", formatDateTime(row.submitted_at)],
       ["참여 날짜", row.event_date],
@@ -312,6 +329,17 @@ window.CheongchunCampus = window.CheongchunCampus || {};
       ["2순위", row.second_choice],
       ["3순위", row.third_choice],
       ["선택 이유", row.choice_reason],
+      [
+        "나를 선택한 사람",
+        inboundChoices.length
+          ? inboundChoices
+              .map(
+                (choice) =>
+                  `${choice.rank}순위 ${getParticipantLabel(choice.from.participant_number)}`
+              )
+              .join("\n")
+          : "없음",
+      ],
       ["좋았던 점", row.good_points],
       ["아쉬웠던 점", row.improvement_points],
       ["다음 참여 의향", row.next_participation],
@@ -338,9 +366,161 @@ window.CheongchunCampus = window.CheongchunCampus || {};
   }
 
   function getChoices(row) {
-    return [row.first_choice, row.second_choice, row.third_choice]
-      .map(normalizeParticipantNumber)
-      .filter(Boolean);
+    return [
+      { rank: 1, value: row.first_choice },
+      { rank: 2, value: row.second_choice },
+      { rank: 3, value: row.third_choice },
+    ]
+      .map((choice) => ({
+        ...choice,
+        number: normalizeParticipantNumber(choice.value),
+      }))
+      .filter((choice) => choice.number);
+  }
+
+  function getMatchingChoices(row) {
+    return getChoices(row).filter((choice) => choice.rank <= 2);
+  }
+
+  function getParticipantMap(rows = state.rows) {
+    return rows.reduce((map, row) => {
+      const number = normalizeParticipantNumber(row.participant_number);
+      if (number && !map.has(number)) {
+        map.set(number, row);
+      }
+      return map;
+    }, new Map());
+  }
+
+  function getParticipantLabel(number, rows = state.rows) {
+    const normalized = normalizeParticipantNumber(number);
+    if (!normalized) {
+      return "";
+    }
+
+    const participant = getParticipantMap(rows).get(normalized);
+    return participant?.reviewer_name
+      ? `${normalized} / ${participant.reviewer_name}`
+      : normalized;
+  }
+
+  function renderChoiceCell(number) {
+    const label = getParticipantLabel(number);
+    return label ? escapeHtml(label) : "-";
+  }
+
+  function getMatchingChoiceRows(rows) {
+    return rows.flatMap((row) =>
+      getMatchingChoices(row).map((choice) => ({
+        from: row,
+        toNumber: choice.number,
+        rank: choice.rank,
+      }))
+    );
+  }
+
+  function getVoteStats(rows) {
+    const participantMap = getParticipantMap(state.rows);
+    const stats = new Map();
+
+    getMatchingChoiceRows(rows).forEach((choice) => {
+      if (!stats.has(choice.toNumber)) {
+        const participant = participantMap.get(choice.toNumber);
+        stats.set(choice.toNumber, {
+          number: choice.toNumber,
+          name: participant?.reviewer_name || "",
+          total: 0,
+          ranks: { 1: 0, 2: 0, 3: 0 },
+          voters: [],
+        });
+      }
+
+      const item = stats.get(choice.toNumber);
+      item.total += 1;
+      item.ranks[choice.rank] += 1;
+      item.voters.push(choice);
+    });
+
+    return Array.from(stats.values()).sort((a, b) => {
+      if (b.total !== a.total) {
+        return b.total - a.total;
+      }
+      if (b.ranks[1] !== a.ranks[1]) {
+        return b.ranks[1] - a.ranks[1];
+      }
+      return a.number.localeCompare(b.number, "ko", { numeric: true });
+    });
+  }
+
+  function getInboundChoices(row, rows) {
+    const myNumber = normalizeParticipantNumber(row.participant_number);
+    if (!myNumber) {
+      return [];
+    }
+
+    return getMatchingChoiceRows(rows)
+      .filter((choice) => choice.toNumber === myNumber)
+      .sort((a, b) => a.rank - b.rank);
+  }
+
+  function renderVoteRanking() {
+    const ranking = getVoteStats(state.filteredRows);
+
+    if (ranking.length === 0) {
+      elements.voteRanking.innerHTML =
+        '<p class="empty-state">표시할 선택 데이터가 없습니다.</p>';
+      return;
+    }
+
+    elements.voteRanking.innerHTML = ranking
+      .map((item, index) => {
+        const voters = item.voters
+          .sort((a, b) => a.rank - b.rank)
+          .map(
+            (choice) =>
+              `<span>${escapeHtml(choice.rank)}순위 ${escapeHtml(
+                getParticipantLabel(choice.from.participant_number)
+              )}</span>`
+          )
+          .join("");
+
+        return `
+          <article class="vote-card">
+            <div class="vote-card-main">
+              <span class="rank-badge">${index + 1}</span>
+              <div>
+                <strong>${escapeHtml(getParticipantLabel(item.number))}</strong>
+                <p>1순위 ${item.ranks[1]}표 · 2순위 ${item.ranks[2]}표</p>
+              </div>
+              <b>${item.total}표</b>
+            </div>
+            <div class="vote-card-voters">${voters}</div>
+          </article>
+        `;
+      })
+      .join("");
+  }
+
+  function renderChoiceFlow() {
+    const choiceRows = getMatchingChoiceRows(state.filteredRows);
+
+    if (choiceRows.length === 0) {
+      elements.choiceFlow.innerHTML =
+        '<p class="empty-state">1·2순위 선택 리뷰가 없습니다.</p>';
+      return;
+    }
+
+    elements.choiceFlow.innerHTML = choiceRows
+      .map(
+        (choice) => `
+          <article class="choice-flow-row">
+            <span>${escapeHtml(getParticipantLabel(choice.from.participant_number))}</span>
+            <strong>${escapeHtml(choice.rank)}순위</strong>
+            <span>${escapeHtml(getParticipantLabel(choice.toNumber))}</span>
+          </article>
+        `
+      )
+      .join("");
   }
 
   function getMutualPairs(rows) {
@@ -364,20 +544,26 @@ window.CheongchunCampus = window.CheongchunCampus || {};
         }
 
         const isMutual =
-          getChoices(row).includes(otherNumber) &&
-          getChoices(other).includes(myNumber);
+          getMatchingChoices(row).some((choice) => choice.number === otherNumber) &&
+          getMatchingChoices(other).some((choice) => choice.number === myNumber);
 
         if (!isMutual) {
           return;
         }
 
+        const firstChoice = getMatchingChoices(row).find(
+          (choice) => choice.number === otherNumber
+        );
+        const secondChoice = getMatchingChoices(other).find(
+          (choice) => choice.number === myNumber
+        );
         const key = [row.id, other.id].sort().join("|");
         if (seen.has(key)) {
           return;
         }
 
         seen.add(key);
-        pairs.push({ first: row, second: other });
+        pairs.push({ first: row, second: other, firstChoice, secondChoice });
       });
     });
 
@@ -389,7 +575,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
 
     if (pairs.length === 0) {
       elements.mutualList.innerHTML =
-        '<p class="empty-state">상호 선택 후보가 없습니다.</p>';
+        '<p class="empty-state">1·2순위 기준 매칭 결과가 없습니다.</p>';
       return;
     }
 
@@ -399,15 +585,19 @@ window.CheongchunCampus = window.CheongchunCampus || {};
           <tr>
             <th>참가자 A</th>
             <th>참가자 B</th>
+            <th>선택 관계</th>
           </tr>
         </thead>
         <tbody>
           ${pairs
             .map(
-              ({ first, second }) => `
+              ({ first, second, firstChoice, secondChoice }) => `
                 <tr>
                   <td>${escapeHtml(first.participant_number)} / ${escapeHtml(first.reviewer_name)}</td>
                   <td>${escapeHtml(second.participant_number)} / ${escapeHtml(second.reviewer_name)}</td>
+                  <td>
+                    ${escapeHtml(firstChoice.rank)}순위 ↔ ${escapeHtml(secondChoice.rank)}순위
+                  </td>
                 </tr>
               `
             )
