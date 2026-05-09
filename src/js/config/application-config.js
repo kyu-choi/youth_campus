@@ -19,15 +19,13 @@ window.CheongchunCampus.config.applicationForm = {
         {
           name: "program_type",
           label: "신청 프로그램",
-          notice: "5월 9일 첫 소개팅 전까지 신청금액 5천원!!",
+          notice: "출시기념 할인 이벤트 진행중 !!",
           type: "choice",
           required: true,
           options: [
             {
               value: "다대다 로테이션 소개팅",
               label: "다대다 로테이션 소개팅",
-              badge: "(남성마감)",
-              badgeTone: "danger",
             },
             "1:1 카톡 소개팅",
           ],
@@ -43,15 +41,13 @@ window.CheongchunCampus.config.applicationForm = {
       fields: [
         {
           name: "preferred_date",
-          label: "참여희망날짜",
+          label: "5월 30일 (토) 오후 12시",
           type: "choice",
           required: true,
           options: [
             {
-              value: "5월 9일 (토) 오후 12시",
-              label: "5월 9일 (토) 오후 12시",
-              badge: "(남성마감)",
-              badgeTone: "danger",
+              value: "5월 30일 (토) 오후 12시",
+              label: "5월 30일 (토) 오후 12시",
             },
           ],
         },
