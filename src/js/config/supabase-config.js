@@ -7,6 +7,8 @@ window.CheongchunCampus.config.supabaseConfig = {
   anonKey: "sb_publishable_X7y_qocsi5UH5By-iEsfOA_0zUiIAc0",
   landingContentTable: "landing_content",
   landingLinksTable: "landing_links",
+  datesTable: "dates",
+  eventParticipantsTable: "event_participants",
   applicationSubmissionsTable: "application_submissions",
   reviewSubmissionsTable: "review_submissions",
   reviewEventDatesView: "review_event_dates",

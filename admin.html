@@ -153,6 +153,12 @@
                 <option value="notified">안내완료</option>
                 <option value="cancelled">취소</option>
               </select>
+              <select id="selection-filter">
+                <option value="pending">대기중만</option>
+                <option value="">전체 선정상태</option>
+                <option value="selected">선정완료</option>
+                <option value="rejected">선정탈락</option>
+              </select>
             </div>
 
             <div class="table-wrap">
@@ -164,6 +170,7 @@
                     <th><button type="button" data-sort-key="age">나이</button></th>
                     <th><button type="button" data-sort-key="gender">성별</button></th>
                     <th><button type="button" data-sort-key="payment_status">입금</button></th>
+                    <th><button type="button" data-sort-key="selection_status">선정</button></th>
                     <th><button type="button" data-sort-key="matching_status">1:1 매칭</button></th>
                     <th><button type="button" data-sort-key="program_type">프로그램</button></th>
                     <th><button type="button" data-sort-key="school">학교</button></th>
@@ -184,10 +191,6 @@
               <article class="detail-card">
                 <h2>일정별 현황</h2>
                 <div id="response-summary" class="mini-table"></div>
-              </article>
-              <article class="detail-card">
-                <h2>음료 준비 수량</h2>
-                <div id="drink-summary" class="mini-table"></div>
               </article>
             </section>
           </div>
@@ -216,6 +219,14 @@
                     <option value="cancelled">취소</option>
                   </select>
                 </label>
+                <label>
+                  선정상태
+                  <select id="selection-status">
+                    <option value="pending">대기</option>
+                    <option value="selected">선정완료</option>
+                    <option value="rejected">선정탈락</option>
+                  </select>
+                </label>
                 <button class="primary-button" type="submit">저장</button>
                 <p id="review-message" class="form-message" role="status"></p>
               </form>
@@ -235,6 +246,7 @@
 
     <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script defer src="src/js/config/supabase-config.js"></script>
+    <script defer src="src/js/config/comfyui-config.js"></script>
     <script defer src="src/js/services/supabase-client.js"></script>
     <script defer src="src/js/admin.js"></script>
   </body>

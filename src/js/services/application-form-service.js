@@ -20,11 +20,13 @@ window.CheongchunCampus.services.submitApplication =
         filesByField
       ),
     };
+    const selectedDate = await findSelectedDate(client, payload);
 
     const { error } = await client
       .from(supabaseConfig.applicationSubmissionsTable)
       .insert({
         payload: payloadWithFiles,
+        date_id: selectedDate?.id || null,
         name: payload.name,
         phone: payload.phone,
         applicant_name: payload.name,
@@ -60,6 +62,7 @@ window.CheongchunCampus.services.submitApplication =
         employment_files:
           payloadWithFiles.uploaded_files?.employment_file_names || [],
         profile_photos: payloadWithFiles.uploaded_files?.profile_photo_names || [],
+        selection_status: "pending",
       });
 
     if (error) {
@@ -68,6 +71,58 @@ window.CheongchunCampus.services.submitApplication =
 
     return { stored: true };
   };
+
+window.CheongchunCampus.services.getApplicationDates =
+  async function getApplicationDates() {
+    const { supabaseConfig } = window.CheongchunCampus.config;
+    const client = window.CheongchunCampus.services.getSupabaseClient();
+
+    if (!client) {
+      return [];
+    }
+
+    const { data, error } = await client
+      .from(supabaseConfig.datesTable)
+      .select("id,title,event_date")
+      .eq("is_active", true)
+      .eq("program_type", "다대다 로테이션 소개팅")
+      .order("display_order", { ascending: true })
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      throw error;
+    }
+
+    return (data || []).map((date) => ({
+      value: date.event_date,
+      label: date.title || date.event_date,
+      date_id: date.id,
+    }));
+  };
+
+async function findSelectedDate(client, payload) {
+  const { supabaseConfig } = window.CheongchunCampus.config;
+
+  if (
+    payload.program_type !== "다대다 로테이션 소개팅" ||
+    !payload.preferred_date
+  ) {
+    return null;
+  }
+
+  const { data, error } = await client
+    .from(supabaseConfig.datesTable)
+    .select("id,event_date")
+    .eq("program_type", "다대다 로테이션 소개팅")
+    .eq("event_date", payload.preferred_date)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
 
 function toNullableNumber(value) {
   if (value === undefined || value === null || value === "") {

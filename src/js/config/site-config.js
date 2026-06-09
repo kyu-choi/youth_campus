@@ -7,9 +7,9 @@ window.CheongchunCampus.config.staticLandingContent = {
     subtitle: "지인 소개는 부담스럽고, 과팅보다 설레는 우리들의 캠퍼스",
   },
   instagram: {
-    label: "인스타그램 바로가기",
+    label: "인스타그램 준비 중",
     badge: "",
-    url: "https://www.instagram.com/c.c.univ/",
+    url: "",
   },
   quickLinks: [
     {
@@ -26,7 +26,7 @@ window.CheongchunCampus.config.staticLandingContent = {
     {
       id: "reviews",
       label: "후기",
-      url: "https://www.instagram.com/c.c.univ/",
+      url: "",
     },
   ],
   contact: {

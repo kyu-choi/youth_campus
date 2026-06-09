@@ -36,6 +36,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     genderFilter: document.getElementById("gender-filter"),
     paymentFilter: document.getElementById("payment-filter"),
     matchingFilter: document.getElementById("matching-filter"),
+    selectionFilter: document.getElementById("selection-filter"),
     refreshButton: document.getElementById("refresh-button"),
     tableBody: document.getElementById("response-table-body"),
     mobileProgramButtons: document.querySelectorAll("[data-mobile-program]"),
@@ -48,9 +49,9 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     paymentStatus: document.getElementById("payment-status"),
     matchingStatusField: document.getElementById("matching-status-field"),
     matchingStatus: document.getElementById("matching-status"),
+    selectionStatus: document.getElementById("selection-status"),
     reviewMessage: document.getElementById("review-message"),
     responseSummary: document.getElementById("response-summary"),
-    drinkSummary: document.getElementById("drink-summary"),
   };
 
   if (!client) {
@@ -95,6 +96,16 @@ window.CheongchunCampus = window.CheongchunCampus || {};
         notified: "안내완료",
         cancelled: "취소",
       }[status] || status || "미매칭"
+    );
+  }
+
+  function getSelectionLabel(status) {
+    return (
+      {
+        pending: "대기",
+        selected: "선정완료",
+        rejected: "선정탈락",
+      }[status] || status || "대기"
     );
   }
 
@@ -243,7 +254,13 @@ window.CheongchunCampus = window.CheongchunCampus || {};
         row.profile_photos ||
         uploadedFiles.profile_photo_names ||
         [],
+      ai_character_photos:
+        row.ai_character_photos ||
+        uploadedFiles.ai_character_photos ||
+        [],
       payment_status: row.payment_status || "unpaid",
+      date_id: row.date_id || payload.date_id || "",
+      selection_status: row.selection_status || "pending",
       matching_status:
         row.program_type === "1:1 카톡 소개팅"
           ? row.matching_status || "unmatched"
@@ -275,6 +292,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     const gender = elements.genderFilter.value;
     const paymentStatus = elements.paymentFilter.value;
     const matchingStatus = elements.matchingFilter.value;
+    const selectionStatus = elements.selectionFilter.value;
 
     state.filteredRows = state.rows.filter((row) => {
       const haystack = [
@@ -296,6 +314,8 @@ window.CheongchunCampus = window.CheongchunCampus || {};
         (!program || row.program_type === program) &&
         (!gender || row.gender === gender) &&
         (!paymentStatus || (row.payment_status || "unpaid") === paymentStatus) &&
+        (!selectionStatus ||
+          (row.selection_status || "pending") === selectionStatus) &&
         (!matchingStatus ||
           (isOneToOne(row) &&
             (row.matching_status || "unmatched") === matchingStatus))
@@ -395,6 +415,9 @@ window.CheongchunCampus = window.CheongchunCampus || {};
         <td data-label="입금"><span class="status-pill" data-status="${escapeHtml(
           row.payment_status || "unpaid"
         )}">${escapeHtml(getPaymentLabel(row.payment_status))}</span></td>
+        <td data-label="선정"><span class="status-pill" data-status="${escapeHtml(
+          row.selection_status || "pending"
+        )}">${escapeHtml(getSelectionLabel(row.selection_status))}</span></td>
         <td data-label="1:1 매칭">${
           isOneToOne(row)
             ? `<span class="status-pill" data-status="${escapeHtml(
@@ -537,6 +560,9 @@ window.CheongchunCampus = window.CheongchunCampus || {};
         <span class="mobile-line-status" data-status="${escapeHtml(
           row.payment_status || "unpaid"
         )}">${escapeHtml(getPaymentLabel(row.payment_status))}</span>
+        <span class="mobile-line-status" data-status="${escapeHtml(
+          row.selection_status || "pending"
+        )}">${escapeHtml(getSelectionLabel(row.selection_status))}</span>
         ${
           isOneToOne(row)
             ? `<span class="mobile-line-status" data-status="${escapeHtml(
@@ -600,6 +626,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
       ["키/몸무게", [row.height_cm, row.weight_kg].filter(Boolean).join(" / ")],
       ["흡연", row.smoking],
       ["입금", getPaymentLabel(row.payment_status)],
+      ["선정", getSelectionLabel(row.selection_status)],
       ...(isOneToOne(row)
         ? [["1:1 매칭", getMatchingLabel(row.matching_status)]]
         : []),
@@ -654,6 +681,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     elements.emptyDetail.hidden = true;
     elements.detailContent.hidden = false;
     elements.paymentStatus.value = row.payment_status || "unpaid";
+    elements.selectionStatus.value = row.selection_status || "pending";
     elements.matchingStatusField.hidden = !isOneToOne(row);
     elements.matchingStatus.value = isOneToOne(row)
       ? row.matching_status || "unmatched"
@@ -680,6 +708,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     const fields = [
       ["접수", formatDateTime(row.submitted_at)],
       ["입금상태", getPaymentLabel(row.payment_status)],
+      ["선정상태", getSelectionLabel(row.selection_status)],
       ...(isOneToOne(row)
         ? [["1:1 매칭상태", getMatchingLabel(row.matching_status)]]
         : []),
@@ -731,17 +760,19 @@ window.CheongchunCampus = window.CheongchunCampus || {};
   }
 
   function renderFiles(target, row) {
-    const files = [
-      ...(Array.isArray(row.student_file) ? row.student_file : []),
-      ...(Array.isArray(row.profile_photos) ? row.profile_photos : []),
-    ];
+    const studentFiles = Array.isArray(row.student_file) ? row.student_file : [];
+    const profilePhotos = Array.isArray(row.profile_photos) ? row.profile_photos : [];
+    const aiCharacterPhotos = Array.isArray(row.ai_character_photos)
+      ? row.ai_character_photos
+      : [];
+    const files = [...studentFiles, ...profilePhotos, ...aiCharacterPhotos];
 
     if (files.length === 0) {
       target.textContent = "-";
       return;
     }
 
-    files.forEach((file) => {
+    studentFiles.forEach((file) => {
       const button = document.createElement("button");
       button.className = "file-button";
       button.type = "button";
@@ -749,19 +780,369 @@ window.CheongchunCampus = window.CheongchunCampus || {};
       button.addEventListener("click", () => openSignedFile(file));
       target.appendChild(button);
     });
+
+    profilePhotos.forEach((file, index) => {
+      const button = document.createElement("button");
+      button.className = "file-button";
+      button.type = "button";
+      button.textContent = file.name || file.path;
+      button.addEventListener("click", () => openSignedFile(file));
+      target.appendChild(button);
+
+      if (!isOneToOne(row)) {
+        return;
+      }
+
+      const existingCharacter = aiCharacterPhotos.find(
+        (characterFile) => characterFile.source_path === file.path
+      );
+      const aiButton = document.createElement("button");
+      aiButton.className = "file-button ai-file-button";
+      aiButton.type = "button";
+      aiButton.textContent = existingCharacter
+        ? `AI 캐릭터 이미지 - ${existingCharacter.name || existingCharacter.path}`
+        : "AI 캐릭터 이미지 생성(ComfyUI)";
+      aiButton.addEventListener("click", () =>
+        existingCharacter
+          ? openCharacterFile(existingCharacter)
+          : generateComfyUiCharacterFile(row, file, aiButton)
+      );
+      target.appendChild(aiButton);
+    });
+
+    aiCharacterPhotos
+      .filter(
+        (characterFile) =>
+          !profilePhotos.some((photo) => photo.path === characterFile.source_path)
+      )
+      .forEach((file) => {
+        const button = document.createElement("button");
+        button.className = "file-button ai-file-button";
+        button.type = "button";
+        button.textContent = `AI 캐릭터 이미지 - ${file.name || file.path}`;
+        button.addEventListener("click", () => openCharacterFile(file));
+        target.appendChild(button);
+      });
   }
 
   async function openSignedFile(file) {
+    const signedUrl = await createSignedFileUrl(file);
+
+    if (!signedUrl) {
+      return;
+    }
+
+    window.open(signedUrl, "_blank", "noreferrer");
+  }
+
+  async function createSignedFileUrl(file) {
     const { data, error } = await client.storage
       .from(file.bucket || "application-files")
       .createSignedUrl(file.path, 60 * 5);
 
     if (error) {
       setMessage(elements.reviewMessage, error.message, true);
+      return "";
+    }
+
+    return data.signedUrl;
+  }
+
+  function openCharacterFile(file) {
+    if (file.blobUrl || file.dataUrl) {
+      window.open(file.blobUrl || file.dataUrl, "_blank", "noreferrer");
       return;
     }
 
-    window.open(data.signedUrl, "_blank", "noreferrer");
+    openSignedFile(file);
+  }
+
+  async function generateComfyUiCharacterFile(row, sourceFile, button) {
+    const originalLabel = button.textContent;
+    const previewWindow = window.open("", "_blank", "noreferrer");
+    button.disabled = true;
+    button.textContent = "ComfyUI 생성 중";
+
+    try {
+      const signedUrl = await createSignedFileUrl(sourceFile);
+
+      if (!signedUrl) {
+        throw new Error("원본 사진 URL을 만들지 못했습니다.");
+      }
+
+      const generatedBlob = await createComfyUiCharacterBlob(sourceFile, signedUrl);
+      const characterFile = await saveCharacterBlob(row, sourceFile, generatedBlob);
+
+      const fileButton = document.createElement("button");
+      fileButton.className = "file-button ai-file-button";
+      fileButton.type = "button";
+      fileButton.textContent = `AI 캐릭터 이미지 - ${characterFile.name}`;
+      fileButton.addEventListener("click", () => openCharacterFile(characterFile));
+      button.replaceWith(fileButton);
+
+      const generatedUrl = await createSignedFileUrl(characterFile);
+      if (previewWindow) {
+        previewWindow.location.href = generatedUrl;
+      } else {
+        openCharacterFile(characterFile);
+      }
+      setMessage(
+        elements.reviewMessage,
+        "ComfyUI 캐릭터 이미지를 생성하고 저장했습니다."
+      );
+    } catch (error) {
+      previewWindow?.close();
+      button.disabled = false;
+      button.textContent = originalLabel;
+      const message =
+        error instanceof Error
+          ? error.message
+          : "AI 캐릭터 이미지 생성에 실패했습니다.";
+      setMessage(
+        elements.reviewMessage,
+        message,
+        true
+      );
+    }
+  }
+
+  async function createComfyUiCharacterBlob(sourceFile, signedUrl) {
+    const comfyUiConfig = window.CheongchunCampus.config.comfyUi || {};
+
+    if (!comfyUiConfig.workflow) {
+      throw new Error("ComfyUI API 워크플로우가 설정되지 않았습니다.");
+    }
+
+    const apiUrl = (comfyUiConfig.apiUrl || "http://127.0.0.1:8188").replace(
+      /\/$/,
+      ""
+    );
+    const sourceBlob = await fetchBlob(signedUrl);
+    const uploadedImage = await uploadComfyUiInputImage(
+      apiUrl,
+      sourceFile,
+      sourceBlob
+    );
+    const prompt = buildComfyUiPrompt(comfyUiConfig, uploadedImage);
+    const promptId = await queueComfyUiPrompt(apiUrl, prompt);
+    const outputImage = await waitForComfyUiImage(apiUrl, promptId, comfyUiConfig);
+
+    return fetchBlob(buildComfyUiViewUrl(apiUrl, outputImage));
+  }
+
+  async function fetchBlob(url) {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error("이미지 파일을 불러오지 못했습니다.");
+    }
+
+    return response.blob();
+  }
+
+  async function uploadComfyUiInputImage(apiUrl, sourceFile, sourceBlob) {
+    const formData = new FormData();
+    const fileName = sanitizeFileName(sourceFile.name || "profile.jpg");
+
+    formData.append("image", sourceBlob, fileName);
+    formData.append("type", "input");
+    formData.append("overwrite", "true");
+
+    const response = await fetch(`${apiUrl}/upload/image`, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error("ComfyUI에 원본 사진을 업로드하지 못했습니다.");
+    }
+
+    return response.json();
+  }
+
+  function buildComfyUiPrompt(comfyUiConfig, uploadedImage) {
+    const prompt = cloneJson(comfyUiConfig.workflow);
+    const imageNode = prompt[comfyUiConfig.inputImageNodeId];
+    const imageInputName = comfyUiConfig.inputImageInputName || "image";
+
+    if (!imageNode?.inputs) {
+      throw new Error("ComfyUI 워크플로우의 원본 이미지 노드 ID를 확인해주세요.");
+    }
+
+    imageNode.inputs[imageInputName] = uploadedImage.name;
+
+    if (comfyUiConfig.positivePromptNodeId && comfyUiConfig.positivePrompt) {
+      const positiveNode = prompt[comfyUiConfig.positivePromptNodeId];
+      const promptInputName = comfyUiConfig.positivePromptInputName || "text";
+      if (positiveNode?.inputs) {
+        positiveNode.inputs[promptInputName] = comfyUiConfig.positivePrompt;
+      }
+    }
+
+    if (comfyUiConfig.seedNodeId) {
+      const seedNode = prompt[comfyUiConfig.seedNodeId];
+      const seedInputName = comfyUiConfig.seedInputName || "seed";
+      if (seedNode?.inputs && seedInputName in seedNode.inputs) {
+        seedNode.inputs[seedInputName] = Math.floor(Math.random() * 1000000000000);
+      }
+    }
+
+    return prompt;
+  }
+
+  async function queueComfyUiPrompt(apiUrl, prompt) {
+    const response = await fetch(`${apiUrl}/prompt`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        client_id: window.crypto?.randomUUID?.() || String(Date.now()),
+        prompt,
+      }),
+    });
+
+    if (!response.ok) {
+      const detail = await response.text();
+      throw new Error(`ComfyUI 생성 요청에 실패했습니다. ${detail}`);
+    }
+
+    const data = await response.json();
+    if (!data.prompt_id) {
+      throw new Error("ComfyUI 응답에 prompt_id가 없습니다.");
+    }
+
+    return data.prompt_id;
+  }
+
+  async function waitForComfyUiImage(apiUrl, promptId, comfyUiConfig) {
+    const timeoutMs = comfyUiConfig.timeoutMs || 180000;
+    const pollIntervalMs = comfyUiConfig.pollIntervalMs || 1200;
+    const startedAt = Date.now();
+
+    while (Date.now() - startedAt < timeoutMs) {
+      const response = await fetch(`${apiUrl}/history/${promptId}`);
+
+      if (response.ok) {
+        const history = await response.json();
+        const promptHistory = history[promptId];
+        const image = findComfyUiOutputImage(promptHistory, comfyUiConfig.outputNodeId);
+
+        if (image) {
+          return image;
+        }
+      }
+
+      await sleep(pollIntervalMs);
+    }
+
+    throw new Error("ComfyUI 이미지 생성 시간이 초과되었습니다.");
+  }
+
+  function findComfyUiOutputImage(promptHistory, outputNodeId) {
+    if (!promptHistory?.outputs) {
+      return null;
+    }
+
+    if (outputNodeId && promptHistory.outputs[outputNodeId]?.images?.[0]) {
+      return promptHistory.outputs[outputNodeId].images[0];
+    }
+
+    return Object.values(promptHistory.outputs).find((output) => output.images?.[0])
+      ?.images?.[0];
+  }
+
+  function buildComfyUiViewUrl(apiUrl, image) {
+    const params = new URLSearchParams({
+      filename: image.filename,
+      subfolder: image.subfolder || "",
+      type: image.type || "output",
+    });
+
+    return `${apiUrl}/view?${params.toString()}`;
+  }
+
+  async function saveCharacterBlob(row, sourceFile, blob) {
+    const { supabaseConfig } = window.CheongchunCampus.config;
+    const bucket = supabaseConfig.applicationFilesBucket || "application-files";
+    const path = getCharacterUploadPath(row, sourceFile, blob);
+    const { error: uploadError } = await client.storage.from(bucket).upload(path, blob, {
+      cacheControl: "3600",
+      contentType: blob.type || "image/png",
+      upsert: true,
+    });
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const file = {
+      bucket,
+      path,
+      name: `AI 캐릭터-${sourceFile.name || "profile"}`,
+      type: blob.type || "image/png",
+      size: blob.size,
+      source_path: sourceFile.path,
+      generated_by: "comfyui",
+      generated_at: new Date().toISOString(),
+    };
+    const nextFiles = [
+      ...(row.ai_character_photos || []).filter(
+        (item) => item.source_path !== sourceFile.path
+      ),
+      file,
+    ];
+    const { error: updateError } = await client
+      .from(supabaseConfig.applicationSubmissionsTable)
+      .update({ ai_character_photos: nextFiles })
+      .eq("id", row.id);
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    row.ai_character_photos = nextFiles;
+    return file;
+  }
+
+  function getCharacterUploadPath(row, sourceFile, blob) {
+    const extension = getImageExtension(blob.type, sourceFile.name);
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const applicant = sanitizeFileName(row.name || "unknown");
+    const sourceName = sanitizeFileName(sourceFile.name || "profile");
+
+    return `ai-character/${row.id}/${timestamp}-${applicant}-${sourceName}.${extension}`;
+  }
+
+  function getImageExtension(contentType, fileName = "") {
+    if (contentType === "image/jpeg") {
+      return "jpg";
+    }
+
+    if (contentType === "image/webp") {
+      return "webp";
+    }
+
+    if (contentType === "image/png") {
+      return "png";
+    }
+
+    return fileName.split(".").pop()?.toLowerCase() || "png";
+  }
+
+  function sanitizeFileName(fileName) {
+    return String(fileName)
+      .normalize("NFKD")
+      .replace(/[^\w.\-]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "")
+      .toLowerCase();
+  }
+
+  function cloneJson(value) {
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   function selectMatchCandidate(row) {
@@ -785,8 +1166,24 @@ window.CheongchunCampus = window.CheongchunCampus || {};
 
     const updates = {
       payment_status: elements.paymentStatus.value,
+      selection_status: elements.selectionStatus.value,
       reviewed_at: new Date().toISOString(),
     };
+
+    if (elements.selectionStatus.value === "selected") {
+      updates.selected_at = new Date().toISOString();
+      updates.rejected_at = null;
+    }
+
+    if (elements.selectionStatus.value === "rejected") {
+      updates.rejected_at = new Date().toISOString();
+      updates.selected_at = null;
+    }
+
+    if (elements.selectionStatus.value === "pending") {
+      updates.rejected_at = null;
+      updates.selected_at = null;
+    }
 
     if (isOneToOne(state.selectedRow)) {
       updates.matching_status = elements.matchingStatus.value;
@@ -804,6 +1201,18 @@ window.CheongchunCampus = window.CheongchunCampus || {};
       return;
     }
 
+    if (
+      elements.selectionStatus.value === "selected" &&
+      state.selectedRow.program_type === "다대다 로테이션 소개팅" &&
+      state.selectedRow.date_id
+    ) {
+      const participantError = await createEventParticipant(state.selectedRow);
+      if (participantError) {
+        setMessage(elements.reviewMessage, participantError.message, true);
+        return;
+      }
+    }
+
     setMessage(elements.reviewMessage, "저장했습니다.");
     await loadData();
     const updated = state.rows.find((row) => row.id === state.selectedRow.id);
@@ -812,26 +1221,34 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     }
   }
 
+  async function createEventParticipant(row) {
+    const { error } = await client
+      .from("event_participants")
+      .upsert(
+        {
+          date_id: row.date_id,
+          submission_id: row.id,
+          attendance_status: "pending",
+        },
+        { onConflict: "date_id,submission_id" }
+      );
+
+    return error;
+  }
+
   function renderSummary() {
     const responseRows = buildResponseSummary();
-    const drinkRows = buildDrinkSummary();
-
     elements.responseSummary.innerHTML = renderMiniTable(responseRows, [
       ["일정", "preferred_date"],
       ["프로그램", "program_type"],
       ["입금", "payment_status"],
+      ["선정", "selection_status"],
       ["1:1 매칭", "matching_status"],
       ["전체", "total_count"],
       ["남", "male_count"],
       ["여", "female_count"],
     ]);
 
-    elements.drinkSummary.innerHTML = renderMiniTable(drinkRows, [
-      ["일정", "preferred_date"],
-      ["음료", "drink"],
-      ["온도", "drink_temperature"],
-      ["수량", "total_count"],
-    ]);
   }
 
   function buildResponseSummary() {
@@ -842,6 +1259,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
         row.preferred_date || "",
         row.program_type || "",
         row.payment_status || "unpaid",
+        row.selection_status || "pending",
         isOneToOne(row) ? row.matching_status || "unmatched" : "",
       ].join("|");
 
@@ -850,6 +1268,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
           preferred_date: row.preferred_date || "",
           program_type: row.program_type || "",
           payment_status: row.payment_status || "unpaid",
+          selection_status: row.selection_status || "pending",
           matching_status: isOneToOne(row)
             ? row.matching_status || "unmatched"
             : "-",
@@ -868,33 +1287,6 @@ window.CheongchunCampus = window.CheongchunCampus || {};
         group.female_count += 1;
       }
     });
-
-    return Array.from(groups.values());
-  }
-
-  function buildDrinkSummary() {
-    const groups = new Map();
-
-    state.rows
-      .filter((row) => row.payment_status === "paid")
-      .forEach((row) => {
-        const key = [
-          row.preferred_date || "",
-          row.drink || "",
-          row.drink_temperature || "",
-        ].join("|");
-
-        if (!groups.has(key)) {
-          groups.set(key, {
-            preferred_date: row.preferred_date || "",
-            drink: row.drink || "",
-            drink_temperature: row.drink_temperature || "",
-            total_count: 0,
-          });
-        }
-
-        groups.get(key).total_count += 1;
-      });
 
     return Array.from(groups.values());
   }
@@ -956,6 +1348,10 @@ window.CheongchunCampus = window.CheongchunCampus || {};
       );
     }
 
+    if (key === "selection_status") {
+      return getSelectionLabel(value);
+    }
+
     return value || "-";
   }
 
@@ -990,6 +1386,7 @@ window.CheongchunCampus = window.CheongchunCampus || {};
     elements.genderFilter,
     elements.paymentFilter,
     elements.matchingFilter,
+    elements.selectionFilter,
   ].forEach((element) => {
     element.addEventListener("input", applyFilters);
     element.addEventListener("change", applyFilters);

@@ -26,6 +26,9 @@ window.CheongchunCampus.config.applicationForm = {
             {
               value: "다대다 로테이션 소개팅",
               label: "다대다 로테이션 소개팅",
+              badge: "임시마감",
+              badgeTone: "danger",
+              disabled: true,
             },
             "1:1 카톡 소개팅",
           ],
@@ -41,15 +44,11 @@ window.CheongchunCampus.config.applicationForm = {
       fields: [
         {
           name: "preferred_date",
-          label: "5월 30일 (토) 오후 12시",
+          label: "참여 일정",
           type: "choice",
           required: true,
-          options: [
-            {
-              value: "5월 30일 (토) 오후 12시",
-              label: "5월 30일 (토) 오후 12시",
-            },
-          ],
+          options: [],
+          dynamicOptions: "applicationDates",
         },
         {
           name: "companion_name",

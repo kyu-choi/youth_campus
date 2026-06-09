@@ -10,6 +10,7 @@ window.CheongchunCampus.ui.renderApplicationForm =
     let currentPage = 0;
     const values = {};
     const files = {};
+    const dynamicOptions = {};
 
     function matchesCondition(condition) {
       if (!condition) {
@@ -172,9 +173,18 @@ window.CheongchunCampus.ui.renderApplicationForm =
 
       if (field.type === "choice") {
         const choices = document.createElement("div");
+        const options = dynamicOptions[field.name] || field.options || [];
         choices.className = "choice-grid";
 
-        field.options.forEach((option) => {
+        if (options.length === 0) {
+          const empty = document.createElement("p");
+          empty.className = "empty-state";
+          empty.textContent = field.emptyLabel || "선택 가능한 항목이 없습니다.";
+          wrapper.append(label, empty);
+          return wrapper;
+        }
+
+        options.forEach((option) => {
           const optionConfig =
             typeof option === "string" ? { value: option, label: option } : option;
           const choice = document.createElement("label");
@@ -182,10 +192,12 @@ window.CheongchunCampus.ui.renderApplicationForm =
           const text = document.createElement("span");
 
           choice.className = "choice-option";
+          choice.classList.toggle("is-disabled", Boolean(optionConfig.disabled));
           input.type = "radio";
           input.name = field.name;
           input.value = optionConfig.value;
           input.checked = values[field.name] === optionConfig.value;
+          input.disabled = Boolean(optionConfig.disabled);
           text.className = "choice-option-text";
           text.textContent = optionConfig.label;
 
@@ -413,5 +425,31 @@ window.CheongchunCampus.ui.renderApplicationForm =
       mount.append(homeButton, section);
     }
 
-    render();
+    async function initialize() {
+      const dateField = config.pages
+        .flatMap((page) => page.fields)
+        .find((field) => field.dynamicOptions === "applicationDates");
+
+      if (!dateField) {
+        render();
+        return;
+      }
+
+      try {
+        dynamicOptions[dateField.name] =
+          await window.CheongchunCampus.services.getApplicationDates();
+
+        if (dynamicOptions[dateField.name].length === 0) {
+          dateField.emptyLabel = "현재 선택 가능한 일정이 없습니다.";
+        }
+      } catch (error) {
+        console.error("Application dates load failed.", error);
+        dynamicOptions[dateField.name] = [];
+        dateField.emptyLabel = "일정을 불러오지 못했습니다.";
+      }
+
+      render();
+    }
+
+    initialize();
   };

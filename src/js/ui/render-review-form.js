@@ -9,6 +9,7 @@ window.CheongchunCampus.ui.renderReviewForm =
 
     const values = {};
     const dynamicOptions = {};
+    let participantOptions = [];
 
     function matchesCondition(condition) {
       if (!condition) {
@@ -21,17 +22,26 @@ window.CheongchunCampus.ui.renderReviewForm =
     }
 
     function getOpponentOptions() {
-      const maxNumber = 12;
       const gender = values.participant_gender;
-      const prefix =
-        gender === "남성" ? "여자" : gender === "여성" ? "남자" : "참가자";
+      const opponentGender = gender === "남성" ? "여성" : gender === "여성" ? "남성" : "";
 
-      return Array.from({ length: maxNumber }, (_, index) => {
-        const number = index + 1;
-        return prefix === "참가자"
-          ? [`남자 ${number}번`, `여자 ${number}번`]
-          : [`${prefix} ${number}번`];
-      }).flat();
+      return participantOptions
+        .filter(
+          (participant) =>
+            participant.participant_number &&
+            participant.participant_number !== values.participant_number &&
+            (!opponentGender || participant.gender === opponentGender)
+        )
+        .map((participant) => ({
+          value: participant.participant_number,
+          label: [
+            participant.participant_number,
+            participant.nickname,
+            participant.name,
+          ]
+            .filter(Boolean)
+            .join(" / "),
+        }));
     }
 
     function getFieldValue(field) {
@@ -65,7 +75,13 @@ window.CheongchunCampus.ui.renderReviewForm =
           return;
         }
 
-        setFieldValue(field, node.querySelector("input, select, textarea")?.value.trim() || "");
+        const input = node.querySelector("input, select, textarea");
+        setFieldValue(field, input?.value.trim() || "");
+
+        if (field.name === "event_date") {
+          const selectedOption = input?.selectedOptions?.[0];
+          values.date_id = selectedOption?.dataset.dateId || "";
+        }
       });
     }
 
@@ -128,8 +144,33 @@ window.CheongchunCampus.ui.renderReviewForm =
 
       select.name = field.name;
       select.appendChild(new Option(field.emptyLabel || "선택 안 함", ""));
-      options.forEach((option) => select.appendChild(new Option(option, option)));
+      options.forEach((option) => {
+        const optionConfig =
+          typeof option === "string" ? { value: option, label: option } : option;
+        const optionNode = new Option(optionConfig.label, optionConfig.value);
+
+        if (optionConfig.date_id) {
+          optionNode.dataset.dateId = optionConfig.date_id;
+        }
+
+        select.appendChild(optionNode);
+      });
       select.value = values[field.name] || "";
+      select.addEventListener("change", async () => {
+        collectInputs();
+
+        if (field.name === "event_date") {
+          await loadParticipants();
+        }
+
+        if (
+          ["event_date", "participant_gender", "participant_number"].includes(
+            field.name
+          )
+        ) {
+          render();
+        }
+      });
 
       return select;
     }
@@ -328,6 +369,24 @@ window.CheongchunCampus.ui.renderReviewForm =
       }
 
       render();
+    }
+
+    async function loadParticipants() {
+      participantOptions = [];
+
+      if (!values.date_id) {
+        return;
+      }
+
+      try {
+        participantOptions =
+          await window.CheongchunCampus.services.getReviewParticipants(
+            values.date_id
+          );
+      } catch (error) {
+        console.error("Review participants load failed.", error);
+        participantOptions = [];
+      }
     }
 
     initialize();

@@ -139,6 +139,15 @@
   accent-color: var(--coral);
 }
 
+.choice-option.is-disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+}
+
+.choice-option.is-disabled .choice-option-text {
+  color: var(--muted);
+}
+
 .choice-option-text {
   display: flex;
   flex: 1 1 auto;
