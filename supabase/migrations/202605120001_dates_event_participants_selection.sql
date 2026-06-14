@@ -133,7 +133,9 @@ alter table public.review_submissions
   add column if not exists third_choice_nickname text,
   add column if not exists third_choice_kakao_id text;
 
-create or replace view public.review_event_dates as
+drop view if exists public.review_event_dates;
+
+create view public.review_event_dates as
 select id, event_date, title, program_type, display_order
 from public.dates
 where is_active = true
