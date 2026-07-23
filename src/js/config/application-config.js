@@ -26,7 +26,6 @@ window.CheongchunCampus.config.applicationForm = {
             {
               value: "다대다 로테이션 소개팅",
               label: "다대다 로테이션 소개팅",
-              badge: "8월 9일 신청 가능",
             },
             "1:1 카톡 소개팅",
           ],
