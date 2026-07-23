@@ -44,8 +44,16 @@ window.CheongchunCampus.config.applicationForm = {
           label: "참여 일정",
           type: "choice",
           required: true,
-          options: [],
-          dynamicOptions: "applicationDates",
+          options: [
+            {
+              value: "2026-08-09",
+              label: "8월 9일 (일)",
+            },
+            {
+              value: "2026-08-23",
+              label: "8월 23일 (일)",
+            },
+          ],
         },
         {
           name: "companion_name",
