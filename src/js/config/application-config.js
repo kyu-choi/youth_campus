@@ -46,12 +46,8 @@ window.CheongchunCampus.config.applicationForm = {
           required: true,
           options: [
             {
-              value: "2026-08-09",
-              label: "8월 9일 (일)",
-            },
-            {
-              value: "2026-08-23",
-              label: "8월 23일 (일)",
+              value: "2026-08-16",
+              label: "8월 16일 (일)",
             },
           ],
         },
